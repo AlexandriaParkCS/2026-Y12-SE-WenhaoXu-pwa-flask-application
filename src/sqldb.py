@@ -118,7 +118,7 @@ class SqlDb(object):
 
 # Example usage
 if __name__ == "__main__":
-    db = SqlDb("db/sql.db")
+    db = SqlDb("runtime/db/sql.db")
 
     # Create
     user = db.create_user("emiltech", "emil@example.com")

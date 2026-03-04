@@ -8,10 +8,9 @@ from flask_wtf import CSRFProtect
 from flask_csp.csp import csp_header
 
 from sqldb import SqlDb
+
 # OR
 # from ormdb import OrmDb
-
-# Wenhao was here
 
 log = logging.getLogger(__name__)
 logging.basicConfig(
@@ -26,9 +25,10 @@ sql_db = SqlDb("../runtime/db/sql.db")
 # orm_db = OrmDb("../runtime/db/orm.db")
 
 app = Flask(__name__)
-app.secret_key = b"G6z115u8WnfQ0UIJ"  # To get a unique basic 16 key: https://acte.ltd/utils/randomkeygen
+app.secret_key = b"FtI7fPmZ5Gw4xFg3"  # To get a unique basic 16 key: https://acte.ltd/utils/randomkeygen
 
 csrf = CSRFProtect(app)
+
 
 # Redirect index.html to domain root for consistent UX
 @app.route("/index", methods=["GET"])
@@ -38,6 +38,7 @@ csrf = CSRFProtect(app)
 @app.route("/index.html", methods=["GET"])
 def root():
     return redirect("/", 302)
+
 
 @app.route("/", methods=["POST", "GET"])
 @csp_header(
@@ -63,9 +64,11 @@ def root():
 def index():
     return render_template("/index.html")
 
+
 @app.route("/privacy.html", methods=["GET"])
 def privacy():
     return render_template("/privacy.html")
+
 
 @app.route("/form.html", methods=["POST", "GET"])
 def form():
@@ -77,12 +80,14 @@ def form():
     else:
         return render_template("/form.html")
 
+
 # Endpoint for logging CSP violations
 @app.route("/csp_report", methods=["POST"])
 @csrf.exempt
 def csp_report():
     app.logger.critical(request.data)
     return "done"
+
 
 if __name__ == "__main__":
     # app.logger.debug("Started")
