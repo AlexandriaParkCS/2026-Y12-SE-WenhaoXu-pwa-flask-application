@@ -1,5 +1,5 @@
 import sqlite3
-
+import bcrypt
 class SqlDb(object):
 
     def __init__(self, db_path="db/app.db"):
@@ -19,7 +19,20 @@ class SqlDb(object):
                 CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username TEXT UNIQUE NOT NULL,
-                email TEXT UNIQUE NOT NULL)
+                email TEXT UNIQUE NOT NULL,
+                phone INTEGER UNIQUE,
+                password_hash TEXT NOT NULL)
+            """)
+
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS whiteboards (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT UNIQUE NOT NULL,
+                description TEXT,
+                last_accessed TEXT NOT NULL,
+                user_id INTEGER,
+                FOREIGN KEY (user_id) REFERENCES users(id)
+                )
             """)
             conn.commit()
         except sqlite3.Error as e:
@@ -30,18 +43,18 @@ class SqlDb(object):
             if conn: 
                 conn.close()
 
-    def create_user(self, username, email):
+    def create_user(self, username, email, password_hash):
         conn = None
         try:
             conn = self._connect()
             cursor = conn.cursor()
             cursor.execute(
-                "INSERT INTO users (username, email) VALUES (?, ?)",
-                (username, email)
+                "INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)",
+                (username, email, password_hash)
             )
             conn.commit()
             user_id = cursor.lastrowid
-            return {"id": user_id, "username": username, "email": email}
+            return {"id": user_id, "username": username, "email": email, "password_hash": password_hash}
         except sqlite3.IntegrityError:
             print("Error: Username or email already exists.")
         except sqlite3.Error as e:
@@ -121,7 +134,7 @@ if __name__ == "__main__":
     db = SqlDb("runtime/db/sql.db")
 
     # Create
-    user = db.create_user("emiltech", "emil@example.com")
+    user = db.create_user("emiltech", "emil@example.com", bcrypt.hashpw("password".encode('utf-8'), bcrypt.gensalt()))
     print("Created:", user)
 
     # Read

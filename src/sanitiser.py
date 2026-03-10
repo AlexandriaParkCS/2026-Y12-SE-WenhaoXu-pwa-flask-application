@@ -7,8 +7,6 @@ class Contact_Information:
         self.name = name
         self.email = email
         self.phone = phone 
-        self.tfn = tfn
-        self.cc = cc
 
     def Sanitise_Name(self, name):
         # It will be similar for every sanitisation
@@ -92,42 +90,6 @@ class Contact_Information:
                 except: return False
         except: return False
 
-    def Sanitise_TFN(self, tfn):
-        bad_letters = []
-        for letter in range(len(tfn)):
-            # casefold converts any uppercase into lowercase
-            # accepted characters are all in lowercase
-            if tfn[letter].casefold() not in integers:
-                bad_letters.append(tfn[letter])
-        
-        for item in bad_letters:
-            tfn = tfn.replace(item, "")
-        
-        self.tfn = tfn
-
-    def Validate_TFN(self):
-        # TFN needs to be 9 characters long
-        if len(self.tfn) == 9: return True
-        else: return False
-
-    def Sanitise_CC(self, cc):
-        bad_letters = []
-        for letter in range(len(cc)):
-            # casefold converts any uppercase into lowercase
-            # accepted characters are all in lowercase
-            if cc[letter].casefold() not in integers:
-                bad_letters.append(cc[letter])
-        
-        for item in bad_letters:
-            cc = cc.replace(item, "")
-        
-        self.cc = cc
-
-    def Validate_CC(self):
-        # Credit card numbers are between 10-19
-        if len(self.cc) >= 10 and len(self.cc) <= 19: return True
-        else: return False
-
     # These return the name, email, phone, tfn and credit card numbers respectively.
     def get_Name(self):
         return self.name
@@ -137,9 +99,3 @@ class Contact_Information:
     
     def get_Phone(self):
         return self.phone
-    
-    def get_TFN(self):
-        return self.tfn
-    
-    def get_cc(self):
-        return self.cc

@@ -14,13 +14,13 @@ from sqldb import SqlDb
 
 log = logging.getLogger(__name__)
 logging.basicConfig(
-    filename="../runtime/log/app.log",
+    filename="runtime/log/app.log",
     encoding="utf-8",
     level=logging.DEBUG,
     format=" %(asctime)s %(message)s",
 )
 
-sql_db = SqlDb("../runtime/db/sql.db")
+sql_db = SqlDb("runtime/db/sql.db")
 # OR
 # orm_db = OrmDb("../runtime/db/orm.db")
 
