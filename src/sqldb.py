@@ -25,11 +25,10 @@ class SqlDb(object):
             """)
 
             cursor.execute("""
-                CREATE TABLE IF NOT EXISTS whiteboards (
+                CREATE TABLE IF NOT EXISTS chores (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT UNIQUE NOT NULL,
                 description TEXT,
-                last_accessed TEXT NOT NULL,
                 user_id INTEGER,
                 FOREIGN KEY (user_id) REFERENCES users(id)
                 )

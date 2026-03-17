@@ -80,6 +80,19 @@ def form():
     else:
         return render_template("/form.html")
 
+# what i do?
+'''
+@app.route("/login.html", methods=["POST", "GET"])
+def sign_up():
+    username = request.form['username']
+    email = request.form['email']
+    password = request.form['password']
+
+@app.route()
+def login():
+    username = request.form['username']
+    password = request.form['password']
+'''
 
 # Endpoint for logging CSP violations
 @app.route("/csp_report", methods=["POST"])

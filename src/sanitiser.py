@@ -3,7 +3,7 @@ email_characters = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", 
 integers = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
 
 class Contact_Information:
-    def __init__(self, name, email, phone, tfn, cc):
+    def __init__(self, name, email, phone):
         self.name = name
         self.email = email
         self.phone = phone 
