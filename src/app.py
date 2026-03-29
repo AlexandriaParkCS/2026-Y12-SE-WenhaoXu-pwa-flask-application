@@ -4,8 +4,11 @@ from flask import Flask
 from flask import render_template
 from flask import request
 from flask import redirect
+from flask import url_for
+from flask import session
 from flask_wtf import CSRFProtect
 from flask_csp.csp import csp_header
+from datetime import timedelta
 
 from sqldb import SqlDb
 
@@ -21,12 +24,10 @@ logging.basicConfig(
 )
 
 sql_db = SqlDb("runtime/db/sql.db")
-# OR
-# orm_db = OrmDb("../runtime/db/orm.db")
 
 app = Flask(__name__)
 app.secret_key = b"FtI7fPmZ5Gw4xFg3"  # To get a unique basic 16 key: https://acte.ltd/utils/randomkeygen
-
+app.permanent_session_lifetime = timedelta(minutes=2) # 2 minutes for testing purposes
 csrf = CSRFProtect(app)
 
 
@@ -69,7 +70,7 @@ def index():
 def privacy():
     return render_template("/privacy.html")
 
-
+'''
 @app.route("/form.html", methods=["POST", "GET"])
 def form():
     if request.method == "POST":
@@ -79,6 +80,40 @@ def form():
         return render_template("/form.html")
     else:
         return render_template("/form.html")
+'''
+
+@app.route("/login.html", methods=["POST", "GET"])
+def login():
+    if request.method == "POST":
+        session.permanent = True
+        email = request.form["email"]
+        password = request.form["password"]
+        #print(f"<From(email={email}, password={password})>")
+        session["user"] = email
+        return redirect(url_for("user"))
+    else:
+        # add code to 
+        return render_template("/login.html")
+
+@app.route("/signup.html", methods=["POST", "GET"])
+def sign_up():
+    if request.method == "POST":
+        username = request.form["name"]
+        email = request.form["email"]
+        password = request.form["password"]
+        #print(f"<From(email={email}, password={password}, username={username})>")
+        return render_template("/signup.html")
+    else:
+        return render_template("/signup.html")
+
+@app.route("/user", methods=["POST", "GET"])
+def user():
+    if "user" in session:
+        user = session["user"]
+        return render_template("userpage.html")
+    else:
+        redirect(url_for("login.html"))
+
 
 # Endpoint for logging CSP violations
 @app.route("/csp_report", methods=["POST"])
