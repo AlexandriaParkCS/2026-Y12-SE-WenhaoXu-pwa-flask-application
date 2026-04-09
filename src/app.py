@@ -6,11 +6,15 @@ from flask import request
 from flask import redirect
 from flask import url_for
 from flask import session
+from flask import flash
 from flask_wtf import CSRFProtect
 from flask_csp.csp import csp_header
 from datetime import timedelta
 
 from sqldb import SqlDb
+from sanitiser import sanitise
+from validater import validate
+from encrypt import hash_password
 
 # OR
 # from ormdb import OrmDb
@@ -66,7 +70,7 @@ def index():
     return render_template("/index.html")
 
 
-@app.route("/privacy.html", methods=["GET"])
+@app.route("/privacy", methods=["GET"])
 def privacy():
     return render_template("/privacy.html")
 
@@ -81,38 +85,65 @@ def form():
     else:
         return render_template("/form.html")
 '''
-
-@app.route("/login.html", methods=["POST", "GET"])
+# Perhaps change to two screens; login by email or login by username
+# Unfinished, need to add the user information onto the database
+@app.route("/login", methods=["POST", "GET"])
 def login():
     if request.method == "POST":
         session.permanent = True
         email = request.form["email"]
         password = request.form["password"]
-        #print(f"<From(email={email}, password={password})>")
+        '''
+        try:
+            sql_db.get_user_by_email(email)
+        except:
+            pass
+        '''
         session["user"] = email
         return redirect(url_for("user"))
     else:
         # add code to 
         return render_template("/login.html")
 
-@app.route("/signup.html", methods=["POST", "GET"])
+@app.route("/signup", methods=["POST", "GET"])
 def sign_up():
     if request.method == "POST":
-        username = request.form["name"]
+        username = request.form["username"]
         email = request.form["email"]
         password = request.form["password"]
-        #print(f"<From(email={email}, password={password}, username={username})>")
-        return render_template("/signup.html")
+        # Sanitise/Validate
+        # PARTIALLY WORKING IDK
+        try: 
+            validate.vName(username)
+            validate.vEmail(email)
+            validate.vPassword(password)
+        except ValueError: 
+            flash(f"{ValueError}", "error")
+        except: 
+            flash("Something went wrong.", "error")
+        # hash password
+        pwd_hash = hash_password(password)
+
+        try:
+            sql_db.create_user(username, email, pwd_hash)
+            return redirect(url_for("/confirmation")) #change to a confirmation screen of sorts
+        except:
+            return render_template("index.html") #change to error screen / flash a failure msg
     else:
         return render_template("/signup.html")
 
+@app.route("/confirmation", methods=["POST", "GET"])
+def sgnconfirm():
+    return render_template("/signup2.html")
+
+# THIS NEEDS WORK
 @app.route("/user", methods=["POST", "GET"])
 def user():
     if "user" in session:
         user = session["user"]
         return render_template("userpage.html")
     else:
-        redirect(url_for("login.html"))
+        redirect(url_for("login"))
 
 
 # Endpoint for logging CSP violations

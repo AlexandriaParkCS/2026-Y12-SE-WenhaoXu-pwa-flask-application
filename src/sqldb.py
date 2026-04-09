@@ -71,7 +71,27 @@ class SqlDb(object):
             cursor = conn.cursor()
             cursor.execute(
                 "SELECT id, username, email FROM users WHERE username = ?",
-                (username,)
+                (username)
+            )
+            row = cursor.fetchone()
+            if row:
+                return {"id": row[0], "username": row[1], "email": row[2]}
+        except sqlite3.Error as e:
+            print(f"Database error during user retrieval: {e}")
+        finally:
+            if cursor: 
+                cursor.close()
+            if conn: 
+                conn.close()
+
+    def get_user_by_email(self, email):
+        conn = None
+        try:
+            conn = self._connect()
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT id, username, email FROM users WHERE username = ?",
+                (email)
             )
             row = cursor.fetchone()
             if row:

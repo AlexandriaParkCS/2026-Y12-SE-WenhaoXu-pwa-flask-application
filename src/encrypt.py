@@ -1,8 +1,8 @@
 import bcrypt
 
 # Just Testing
+# Bare bones implementation
 '''
-# Bare Bones Implementation
 password1 = b"admin"
 
 salt = bcrypt.gensalt()
@@ -21,5 +21,5 @@ else:
 def hash_password(password):
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
-if bcrypt.checkpw(input("ENTER PASSWORD: ").encode("utf-8"), hash_password("SecretPassword")): print("Y")
-else: print("N")
+# if bcrypt.checkpw(input("ENTER PASSWORD: ").encode("utf-8"), hash_password("SecretPassword")): print("Y")
+# else: print("N")
