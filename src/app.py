@@ -31,7 +31,6 @@ sql_db = SqlDb("runtime/db/sql.db")
 
 app = Flask(__name__)
 app.secret_key = b"FtI7fPmZ5Gw4xFg3"  # To get a unique basic 16 key: https://acte.ltd/utils/randomkeygen
-app.permanent_session_lifetime = timedelta(minutes=2) # 2 minutes for testing purposes
 csrf = CSRFProtect(app)
 
 
@@ -74,17 +73,6 @@ def index():
 def privacy():
     return render_template("/privacy.html")
 
-'''
-@app.route("/form.html", methods=["POST", "GET"])
-def form():
-    if request.method == "POST":
-        email = request.form["email"]
-        text = request.form["text"]
-        print(f"<From(email={email}, text='{text}')>")
-        return render_template("/form.html")
-    else:
-        return render_template("/form.html")
-'''
 # Perhaps change to two screens; login by email or login by username
 # Unfinished, need to add the user information onto the database
 @app.route("/login", methods=["POST", "GET"])
@@ -112,23 +100,29 @@ def sign_up():
         email = request.form["email"]
         password = request.form["password"]
         # Sanitise/Validate
-        # PARTIALLY WORKING IDK
-        try: 
-            validate.vName(username)
-            validate.vEmail(email)
-            validate.vPassword(password)
-        except ValueError: 
-            flash(f"{ValueError}", "error")
-        except: 
-            flash("Something went wrong.", "error")
-        # hash password
-        pwd_hash = hash_password(password)
+        NameValid = validate.vName(username)
+        if NameValid != True:
+            flash(NameValid, "error")
+            return render_template("/signup.html")
+        
+        EmailValid = validate.vEmail(email)
+        if EmailValid != True:
+            flash(EmailValid, "error")
+            return render_template("/signup.html")
+        
+        PwdValid = validate.vPassword(password)
+        if PwdValid != True:
+            flash(PwdValid, "error")
+            return render_template("/signup.html")
 
+        # hash password (TEST PASSWORD: Test1234&%)
+        pwd_hash = hash_password(password)
         try:
             sql_db.create_user(username, email, pwd_hash)
-            return redirect(url_for("/confirmation")) #change to a confirmation screen of sorts
-        except:
-            return render_template("index.html") #change to error screen / flash a failure msg
+            return redirect(url_for("login")) # change to a confirmation screen of sorts
+        except Exception as e:
+            flash(f"Something went wrong!", "error") # flash a failure msg
+            return render_template("/signup.html")
     else:
         return render_template("/signup.html")
 

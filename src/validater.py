@@ -3,24 +3,53 @@ import re
 # EMAIL: pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2, 4}$"
 
 class validate:
-    def vName(self, name):
+    def vName(name):
+        nameNotNull = True
+        nameValid = True
+
         if not name:
-            raise ValueError("Name required.")
+            nameNotNull = False
         # All characters must be an uppercase, lowercase or integer
         if not re.fullmatch(r"[A-Za-z0-9']{2,20}", name):
-            raise ValueError("Name must be 2-20 letters or numbers.")
+            nameValid = False
+        
+        if nameNotNull == False: return "Name cannot be empty."
+        elif nameValid == False: return "Name has to be only integers and letters between 2-20 letters."
+        else: return True
 
     
-    def vEmail(self, email):
+    def vEmail(email):
+        emailNotNull = True
+        emailValid = True
+
         if not email:
-            raise ValueError("Email required.")
+            emailNotNull = False
+        
         # Email
         if not re.fullmatch(r"[A-Za-z0-9._+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}", email):
-            raise ValueError("Invalid email format.")
+            emailValid = False
+        
+        if emailNotNull == False: return "Email cannot be empty."
+        elif emailValid == False: return "Invalid email format."
+        else: return True
 
-    def vPassword(self, password):
+    def vPassword(password):
+        pwdNotNull = True
+        pwdValid = True
+
         if not password:
-            raise ValueError("Password required.")
+            pwdNotNull = False
         # Password
         if not re.fullmatch(r"(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}", password):
-            raise ValueError("Password must include 8 characters, one lowercase, one uppercase, one number and one special character")
+            pwdValid = False
+        
+        if pwdNotNull == False: return "Password cannot be empty."
+        elif pwdValid == False: return "Password must include 8 characters, one lowercase, one uppercase, one number and one special character"
+        else: return True
+
+# TESTING
+'''
+print(validate.vName("yum"))
+print(validate.vEmail("wenhao.xu@education.nsw.gov.au"))
+print(validate.vPassword("Test1234&%"))
+'''

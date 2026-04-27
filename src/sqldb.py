@@ -20,7 +20,6 @@ class SqlDb(object):
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username TEXT UNIQUE NOT NULL,
                 email TEXT UNIQUE NOT NULL,
-                phone INTEGER UNIQUE,
                 password_hash TEXT NOT NULL)
             """)
 
@@ -147,7 +146,7 @@ class SqlDb(object):
                 cursor.close()
             if conn: 
                 conn.close()
-
+'''
 # Example usage
 if __name__ == "__main__":
     db = SqlDb("runtime/db/sql.db")
@@ -167,4 +166,4 @@ if __name__ == "__main__":
     # Delete
     success = db.delete_user("emiltech")
     print("Deleted:", success)
-    
+'''
