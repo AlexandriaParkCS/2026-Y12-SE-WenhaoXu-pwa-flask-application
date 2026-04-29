@@ -14,7 +14,7 @@ from datetime import timedelta
 from sqldb import SqlDb
 from sanitiser import sanitise
 from validater import validate
-from encrypt import hash_password
+from encrypt import hash_password, check_password
 
 # OR
 # from ormdb import OrmDb
@@ -80,21 +80,24 @@ def login():
     if request.method == "POST":
         session.permanent = True
         email = request.form["email"]
-        password = request.form["password"]
-        '''
+        password = request.form["password"] #(TEST PASSWORD: Test1234&%)
         try:
-            sql_db.get_user_by_email(email)
-        except:
-            pass
-        '''
-        session["user"] = email
-        return redirect(url_for("user"))
+            credentials = sql_db.get_user_by_email(email)
+            if check_password(password, credentials["password_hash"]) == True:
+                session["user"] = email
+                return redirect(url_for("home")) # homepage / userpage
+            else:
+                flash("Incorrect password.", "error")
+                return render_template("/login.html")
+        except Exception as e:
+            print(f"Login Error: {e}")
+            flash("Something went wrong.", "error")
+            return render_template("/login.html")
     else:
-        # add code to 
         return render_template("/login.html")
 
 @app.route("/signup", methods=["POST", "GET"])
-def sign_up():
+def sign_up(): # ADD INVALID EMAIL CHECKING
     if request.method == "POST":
         username = request.form["username"]
         email = request.form["email"]
@@ -114,12 +117,12 @@ def sign_up():
         if PwdValid != True:
             flash(PwdValid, "error")
             return render_template("/signup.html")
-
+        
         # hash password (TEST PASSWORD: Test1234&%)
         pwd_hash = hash_password(password)
         try:
             sql_db.create_user(username, email, pwd_hash)
-            return redirect(url_for("login")) # change to a confirmation screen of sorts
+            return redirect("/confirmation") # confirmation screen
         except Exception as e:
             flash(f"Something went wrong!", "error") # flash a failure msg
             return render_template("/signup.html")
@@ -131,10 +134,9 @@ def sgnconfirm():
     return render_template("/signup2.html")
 
 # THIS NEEDS WORK
-@app.route("/user", methods=["POST", "GET"])
-def user():
+@app.route("/home", methods=["POST", "GET"]) #user page / homepage
+def home():
     if "user" in session:
-        user = session["user"]
         return render_template("userpage.html")
     else:
         redirect(url_for("login"))

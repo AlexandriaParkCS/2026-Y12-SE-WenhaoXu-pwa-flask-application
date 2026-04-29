@@ -69,12 +69,12 @@ class SqlDb(object):
             conn = self._connect()
             cursor = conn.cursor()
             cursor.execute(
-                "SELECT id, username, email FROM users WHERE username = ?",
-                (username)
+                "SELECT id, username, email, password_hash FROM users WHERE username = ?",
+                (username,)
             )
             row = cursor.fetchone()
             if row:
-                return {"id": row[0], "username": row[1], "email": row[2]}
+                return {"id": row[0], "username": row[1], "email": row[2], "password_hash": row[3]}
         except sqlite3.Error as e:
             print(f"Database error during user retrieval: {e}")
         finally:
@@ -89,12 +89,12 @@ class SqlDb(object):
             conn = self._connect()
             cursor = conn.cursor()
             cursor.execute(
-                "SELECT id, username, email FROM users WHERE username = ?",
-                (email)
+                "SELECT id, username, email, password_hash FROM users WHERE email = ?",
+                (email,)
             )
             row = cursor.fetchone()
             if row:
-                return {"id": row[0], "username": row[1], "email": row[2]}
+                return {"id": row[0], "username": row[1], "email": row[2], "password_hash": row[3]}
         except sqlite3.Error as e:
             print(f"Database error during user retrieval: {e}")
         finally:
@@ -146,10 +146,10 @@ class SqlDb(object):
                 cursor.close()
             if conn: 
                 conn.close()
-'''
+
 # Example usage
 if __name__ == "__main__":
-    db = SqlDb("runtime/db/sql.db")
+    db = SqlDb("runtime/db/test.db")
 
     # Create
     user = db.create_user("emiltech", "emil@example.com", bcrypt.hashpw("password".encode('utf-8'), bcrypt.gensalt()))
@@ -166,4 +166,3 @@ if __name__ == "__main__":
     # Delete
     success = db.delete_user("emiltech")
     print("Deleted:", success)
-'''

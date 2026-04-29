@@ -1,5 +1,13 @@
 {% extends 'layout.html' %}
 {% block content %}
+<!-- Flash message -->
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      {% for msg in messages %}
+        <p>{{msg}}</p>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
 <div class="container">
   <div class="row">
     <h1>Login</h1>
