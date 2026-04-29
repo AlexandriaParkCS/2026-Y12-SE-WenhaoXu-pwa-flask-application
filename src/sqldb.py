@@ -164,5 +164,5 @@ if __name__ == "__main__":
     print("Updated:", updated_user)
 
     # Delete
-    success = db.delete_user("emiltech")
-    print("Deleted:", success)
+    #success = db.delete_user("emiltech")
+    #print("Deleted:", success)

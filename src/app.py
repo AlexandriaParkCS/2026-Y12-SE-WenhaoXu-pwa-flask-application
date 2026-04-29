@@ -103,26 +103,19 @@ def sign_up(): # ADD INVALID EMAIL CHECKING
 
         # Repeat check
         try:
-            sql_db.get_user_by_username(username)
-            print("Error: Username already exists!")
-            flash("Error: Username is already taken!", "error")
-            return render_template("/signup.html")
+            cred_by_name = sql_db.get_user_by_username(username)
+            cred_by_email = sql_db.get_user_by_email(email)
+            if cred_by_name["username"] == username:
+                print("Error: Username already exists!")
+                flash("Error: Username is already taken!", "error")
+                return render_template("/signup.html")
+            elif cred_by_email["email"] == email:
+                print("Error: Email already exists!")
+                flash("Error: Email already in use!", "error")
+                return render_template("/signup.html")
         except Exception as e:
             print(e)
-            flash(f"{e}", "error") # flash a failure msg
-            return render_template("/signup.html")
-        except: pass
-        
-        try:
-            sql_db.get_user_by_email(email)
-            print("Error: Email already exists!")
-            flash("Error: Email already in use!", "error")
-            return render_template("/signup.html")
-        except Exception as e:
-            print(e)
-            flash(f"{e}", "error") # flash a failure msg
-            return render_template("/signup.html")
-        except: pass
+            pass
 
         # Validate
         NameValid = validate.vName(username)
@@ -150,6 +143,7 @@ def sign_up(): # ADD INVALID EMAIL CHECKING
 
         # hash password (TEST PASSWORD: Test1234&%)
         pwd_hash = hash_password(password)
+        # creation of user
         try:
             sql_db.create_user(username, email, pwd_hash)
             return redirect("/confirmation") # confirmation screen
