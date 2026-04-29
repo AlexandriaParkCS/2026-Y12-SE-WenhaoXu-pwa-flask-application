@@ -73,7 +73,6 @@ def privacy():
     return render_template("/privacy.html")
 
 # Perhaps change to two screens; login by email or login by username
-# Unfinished, need to add the user information onto the database
 @app.route("/login", methods=["POST", "GET"])
 def login():
     if request.method == "POST":
@@ -101,7 +100,31 @@ def sign_up(): # ADD INVALID EMAIL CHECKING
         username = request.form["username"]
         email = request.form["email"]
         password = request.form["password"]
-        # Sanitise/Validate
+
+        # Repeat check
+        try:
+            sql_db.get_user_by_username(username)
+            print("Error: Username already exists!")
+            flash("Error: Username is already taken!", "error")
+            return render_template("/signup.html")
+        except Exception as e:
+            print(e)
+            flash(f"{e}", "error") # flash a failure msg
+            return render_template("/signup.html")
+        except: pass
+        
+        try:
+            sql_db.get_user_by_email(email)
+            print("Error: Email already exists!")
+            flash("Error: Email already in use!", "error")
+            return render_template("/signup.html")
+        except Exception as e:
+            print(e)
+            flash(f"{e}", "error") # flash a failure msg
+            return render_template("/signup.html")
+        except: pass
+
+        # Validate
         NameValid = validate.vName(username)
         if NameValid != True:
             print(f"Name Error: {NameValid}")
@@ -131,6 +154,7 @@ def sign_up(): # ADD INVALID EMAIL CHECKING
             sql_db.create_user(username, email, pwd_hash)
             return redirect("/confirmation") # confirmation screen
         except Exception as e:
+            print(e)
             flash(f"Something went wrong!", "error") # flash a failure msg
             return render_template("/signup.html")
     else:
