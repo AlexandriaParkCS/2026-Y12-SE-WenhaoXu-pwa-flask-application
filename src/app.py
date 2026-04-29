@@ -12,8 +12,7 @@ from flask_csp.csp import csp_header
 from datetime import timedelta
 
 from sqldb import SqlDb
-from sanitiser import sanitise
-from validater import validate
+from validation import validate
 from encrypt import hash_password, check_password
 
 # OR
@@ -105,19 +104,27 @@ def sign_up(): # ADD INVALID EMAIL CHECKING
         # Sanitise/Validate
         NameValid = validate.vName(username)
         if NameValid != True:
+            print(f"Name Error: {NameValid}")
             flash(NameValid, "error")
             return render_template("/signup.html")
         
         EmailValid = validate.vEmail(email)
         if EmailValid != True:
+            print(f"Email Error: {EmailValid}")
             flash(EmailValid, "error")
             return render_template("/signup.html")
         
         PwdValid = validate.vPassword(password)
         if PwdValid != True:
+            print(f"Password Error: {PwdValid}")
             flash(PwdValid, "error")
             return render_template("/signup.html")
         
+        # sanitise
+        username = validate.sanitise(username)
+        email = validate.sanitise(email)
+        password = validate.sanitise(password)
+
         # hash password (TEST PASSWORD: Test1234&%)
         pwd_hash = hash_password(password)
         try:

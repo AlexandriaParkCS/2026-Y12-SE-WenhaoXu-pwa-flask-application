@@ -3,6 +3,26 @@ import re
 # EMAIL: pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2, 4}$"
 
 class validate:
+    def sanitise(s):
+        if s is None:
+            return ""
+        # possible malicous commands
+        patterns = [
+        r"'[^']*'",    # Single quotes
+        r"`[^`]*`",    # Backticks
+        r"\{[^}]*\}",  # Curly braces
+        r"\[[^\]]*\]", # Square brackets
+        r"\([^)]*\)",  # Parentheses
+        r"<[^>]*>",    # Angle brackets
+        r'"[^"]*"'     # Double quotes
+        ]
+        for pattern in patterns:
+            s = re.sub(pattern, '', s)
+        # remove any whitespace at front or back of string
+        s = s.strip() 
+        # replace any characters outside of the ASCII with a blank
+        return re.sub(r"[^\x20-\x7E()]", "", s) 
+
     def vName(name):
         nameNotNull = True
         nameValid = True
