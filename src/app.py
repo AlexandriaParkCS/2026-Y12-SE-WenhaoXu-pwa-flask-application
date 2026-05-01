@@ -95,7 +95,7 @@ def login():
         return render_template("/login.html")
 
 @app.route("/signup", methods=["POST", "GET"])
-def sign_up(): # ADD INVALID EMAIL CHECKING
+def sign_up():
     if request.method == "POST":
         username = request.form["username"]
         email = request.form["email"]
@@ -114,7 +114,7 @@ def sign_up(): # ADD INVALID EMAIL CHECKING
                 flash("Error: Email already in use!", "error")
                 return render_template("/signup.html")
         except Exception as e:
-            print(e)
+            print(f"Error: {e}, HENCE no user or email has previously existed")
             pass
 
         # Validate
@@ -165,6 +165,20 @@ def home():
         return render_template("userpage.html")
     else:
         redirect(url_for("login"))
+
+@app.route("/settings", methods=["POST", "GET"])
+def settings():
+    if "user" in session:
+        return render_template("settings.html")
+    else:
+        return redirect(url_for("login"))
+
+#EXAMPLE LOGOUT
+
+@app.route("/logout", methods=["POST", "GET"])
+def logout():
+    session.pop("user", None)
+    return redirect(url_for("index"))
 
 
 # Endpoint for logging CSP violations
