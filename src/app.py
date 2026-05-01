@@ -65,9 +65,12 @@ def root():
     }
 )
 def index():
-    return render_template("/index.html")
+    if "user" not in session:
+        return render_template("/index.html")
+    else:
+        return redirect(url_for("home"))
 
-
+# find someway to deal w/ this
 @app.route("/privacy", methods=["GET"])
 def privacy():
     return render_template("/privacy.html")
@@ -75,84 +78,88 @@ def privacy():
 # Perhaps change to two screens; login by email or login by username
 @app.route("/login", methods=["POST", "GET"])
 def login():
-    if request.method == "POST":
-        session.permanent = True
-        email = request.form["email"]
-        password = request.form["password"] #(TEST PASSWORD: Test1234&%)
-        try:
-            credentials = sql_db.get_user_by_email(email)
-            if check_password(password, credentials["password_hash"]) == True:
-                session["user"] = email
-                return redirect(url_for("home")) # homepage / userpage
-            else:
-                flash("Incorrect password.", "error")
+    if "user" not in session:
+        if request.method == "POST":
+            session.permanent = True
+            email = request.form["email"]
+            password = request.form["password"] #(TEST PASSWORD: Test1234&%)
+            try:
+                credentials = sql_db.get_user_by_email(email)
+                if check_password(password, credentials["password_hash"]) == True:
+                    session["user"] = email
+                    return redirect(url_for("home")) # homepage / userpage
+                else:
+                    flash("Incorrect password.", "error")
+                    return render_template("/login.html")
+            except Exception as e:
+                print(f"Login Error: {e}")
+                flash("Something went wrong.", "error")
                 return render_template("/login.html")
-        except Exception as e:
-            print(f"Login Error: {e}")
-            flash("Something went wrong.", "error")
+        else:
             return render_template("/login.html")
-    else:
-        return render_template("/login.html")
+    else: return redirect(url_for("home"))
 
 @app.route("/signup", methods=["POST", "GET"])
 def sign_up():
-    if request.method == "POST":
-        username = request.form["username"]
-        email = request.form["email"]
-        password = request.form["password"]
+    if "user" not in session:
+        if request.method == "POST":
+            username = request.form["username"]
+            email = request.form["email"]
+            password = request.form["password"]
 
-        # Repeat check
-        try:
-            cred_by_name = sql_db.get_user_by_username(username)
-            cred_by_email = sql_db.get_user_by_email(email)
-            if cred_by_name["username"] == username:
-                print("Error: Username already exists!")
-                flash("Error: Username is already taken!", "error")
+            # Repeat check
+            try:
+                cred_by_name = sql_db.get_user_by_username(username)
+                cred_by_email = sql_db.get_user_by_email(email)
+                if cred_by_name["username"] == username:
+                    print("Error: Username already exists!")
+                    flash("Error: Username is already taken!", "error")
+                    return render_template("/signup.html")
+                elif cred_by_email["email"] == email:
+                    print("Error: Email already exists!")
+                    flash("Error: Email already in use!", "error")
+                    return render_template("/signup.html")
+            except Exception as e:
+                print(f"Error: {e}, HENCE no user or email has previously existed")
+                pass
+
+            # Validate
+            NameValid = validate.vName(username)
+            if NameValid != True:
+                print(f"Name Error: {NameValid}")
+                flash(NameValid, "error")
                 return render_template("/signup.html")
-            elif cred_by_email["email"] == email:
-                print("Error: Email already exists!")
-                flash("Error: Email already in use!", "error")
+            
+            EmailValid = validate.vEmail(email)
+            if EmailValid != True:
+                print(f"Email Error: {EmailValid}")
+                flash(EmailValid, "error")
                 return render_template("/signup.html")
-        except Exception as e:
-            print(f"Error: {e}, HENCE no user or email has previously existed")
-            pass
+            
+            PwdValid = validate.vPassword(password)
+            if PwdValid != True:
+                print(f"Password Error: {PwdValid}")
+                flash(PwdValid, "error")
+                return render_template("/signup.html")
+            
+            # sanitise
+            username = validate.sanitise(username)
+            email = validate.sanitise(email)
+            password = validate.sanitise(password)
 
-        # Validate
-        NameValid = validate.vName(username)
-        if NameValid != True:
-            print(f"Name Error: {NameValid}")
-            flash(NameValid, "error")
+            # hash password (TEST PASSWORD: Test1234&%)
+            pwd_hash = hash_password(password)
+            # creation of user
+            try:
+                sql_db.create_user(username, email, pwd_hash)
+                return redirect("/confirmation") # confirmation screen
+            except Exception as e:
+                print(e)
+                flash(f"Something went wrong!", "error") # flash a failure msg
+                return render_template("/signup.html")
+        else:
             return render_template("/signup.html")
-        
-        EmailValid = validate.vEmail(email)
-        if EmailValid != True:
-            print(f"Email Error: {EmailValid}")
-            flash(EmailValid, "error")
-            return render_template("/signup.html")
-        
-        PwdValid = validate.vPassword(password)
-        if PwdValid != True:
-            print(f"Password Error: {PwdValid}")
-            flash(PwdValid, "error")
-            return render_template("/signup.html")
-        
-        # sanitise
-        username = validate.sanitise(username)
-        email = validate.sanitise(email)
-        password = validate.sanitise(password)
-
-        # hash password (TEST PASSWORD: Test1234&%)
-        pwd_hash = hash_password(password)
-        # creation of user
-        try:
-            sql_db.create_user(username, email, pwd_hash)
-            return redirect("/confirmation") # confirmation screen
-        except Exception as e:
-            print(e)
-            flash(f"Something went wrong!", "error") # flash a failure msg
-            return render_template("/signup.html")
-    else:
-        return render_template("/signup.html")
+    else: return redirect(url_for("home"))
 
 @app.route("/confirmation", methods=["POST", "GET"])
 def sgnconfirm():
