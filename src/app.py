@@ -173,7 +173,7 @@ def settings():
     else:
         return redirect(url_for("login"))
 
-#EXAMPLE LOGOUT
+# Example Logout; Change maybe?
 
 @app.route("/logout", methods=["POST", "GET"])
 def logout():
@@ -185,22 +185,38 @@ def logout():
 def deleteAccount():
     if "user" in session:
         if request.method == "POST":
-            confirm = request.form["deleteAcc"]
-            email = session["user"]
-            confirm = confirm.strip()
+            username = request.form["deleteAcc"]
+            password = request.form["password"]
+            email = session["user"] # change later
             try:
-                if confirm.casefold() == "yes":
+                userCheck = False
+                pwdCheck = False
+                credentials = sql_db.get_user_by_email(email) # Ensure no delete other ppl password if guessed
+                # Check password, username
+                if credentials["username"] == username: 
+                    userCheck = True
+                if check_password(password, credentials["password_hash"]) == True: 
+                    pwdCheck = True
+
+                if userCheck == False: # match username w/ database
+                    flash("Error: Incorrect Username!", "error")
+                    return render_template("delete_account.html")
+                elif pwdCheck == False:
+                    flash("Error: Incorrect Password!", "error")
+                    return render_template("delete_account.html")
+                else:
+                    print(f"User:{credentials["username"]} deleted!")
                     session.pop("user", None)
                     sql_db.delete_user_by_email(email)
                     return redirect(url_for("index"))
             except Exception as e:
                 print(f"Error deleting account: {e}")
-                flash(f"Error deleting account: {e}")
+                flash(f"Error deleting account: {e}", "error")
                 return render_template("delete_account.html")
         else:
-            return render_template("delete_account.html")
+            return render_template("delete_account.html") # In session
     else: 
-        return redirect(url_for("index"))
+        return redirect(url_for("index")) # Not in session 
 
 # Endpoint for logging CSP violations
 @app.route("/csp_report", methods=["POST"])
