@@ -180,6 +180,27 @@ def logout():
     session.pop("user", None)
     return redirect(url_for("index"))
 
+# REMEMBER TO CHANGE LOGIC IN TRYEXCEPT IF LOGIN GETS CHANGED TO EITHER BY USER/EMAIL
+@app.route("/deleteAccount", methods=["POST", "GET"])
+def deleteAccount():
+    if "user" in session:
+        if request.method == "POST":
+            confirm = request.form["deleteAcc"]
+            email = session["user"]
+            confirm = confirm.strip()
+            try:
+                if confirm.casefold() == "yes":
+                    session.pop("user", None)
+                    sql_db.delete_user_by_email(email)
+                    return redirect(url_for("index"))
+            except Exception as e:
+                print(f"Error deleting account: {e}")
+                flash(f"Error deleting account: {e}")
+                return render_template("delete_account.html")
+        else:
+            return render_template("delete_account.html")
+    else: 
+        return redirect(url_for("index"))
 
 # Endpoint for logging CSP violations
 @app.route("/csp_report", methods=["POST"])

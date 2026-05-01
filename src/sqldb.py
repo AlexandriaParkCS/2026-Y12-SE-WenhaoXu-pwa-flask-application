@@ -127,7 +127,7 @@ class SqlDb(object):
             if conn: 
                 conn.close()
 
-    def delete_user(self, username):
+    def delete_user_by_user(self, username):
         conn = None
         try:
             conn = self._connect()
@@ -135,6 +135,26 @@ class SqlDb(object):
             cursor.execute(
                 "DELETE FROM users WHERE username = ?",
                 (username,)
+            )
+            conn.commit()
+            return cursor.rowcount > 0
+        except sqlite3.Error as e:
+            print(f"Database error during deletion: {e}")
+            return False
+        finally:
+            if cursor: 
+                cursor.close()
+            if conn: 
+                conn.close()
+
+    def delete_user_by_email(self, email):
+        conn = None
+        try:
+            conn = self._connect()
+            cursor = conn.cursor()
+            cursor.execute(
+                "DELETE FROM users WHERE email = ?",
+                (email,)
             )
             conn.commit()
             return cursor.rowcount > 0
@@ -164,5 +184,5 @@ if __name__ == "__main__":
     print("Updated:", updated_user)
 
     # Delete
-    #success = db.delete_user("emiltech")
-    #print("Deleted:", success)
+    success = db.delete_user_by_user("emiltech")
+    print("Deleted:", success)
