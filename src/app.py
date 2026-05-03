@@ -110,18 +110,21 @@ def sign_up():
             # Repeat check
             try:
                 cred_by_name = sql_db.get_user_by_username(username)
-                cred_by_email = sql_db.get_user_by_email(email)
                 if cred_by_name["username"] == username:
                     print("Error: Username already exists!")
                     flash("Error: Username is already taken!", "error")
                     return render_template("/signup.html")
-                elif cred_by_email["email"] == email:
+            except Exception as e:
+                print(f"Error: {e}, HENCE no user has previously existed")
+
+            try:
+                cred_by_email = sql_db.get_user_by_email(email)
+                if cred_by_email["email"] == email:
                     print("Error: Email already exists!")
                     flash("Error: Email already in use!", "error")
                     return render_template("/signup.html")
             except Exception as e:
-                print(f"Error: {e}, HENCE no user or email has previously existed")
-                pass
+                print(f"Error: {e}, HENCE no email has previously existed")
 
             # Validate
             NameValid = validate.vName(username)
@@ -155,7 +158,7 @@ def sign_up():
                 return redirect("/confirmation") # confirmation screen
             except Exception as e:
                 print(e)
-                flash(f"Something went wrong!", "error") # flash a failure msg
+                flash(f"Something went wrong!", "error")
                 return render_template("/signup.html")
         else:
             return render_template("/signup.html")
@@ -212,7 +215,7 @@ def deleteAccount():
                     flash("Error: Incorrect Password!", "error")
                     return render_template("delete_account.html")
                 else:
-                    print(f"User:{credentials["username"]} deleted!")
+                    print(f"User: '{credentials["username"]}' deleted!")
                     session.pop("user", None)
                     sql_db.delete_user_by_email(email)
                     return redirect(url_for("index"))
