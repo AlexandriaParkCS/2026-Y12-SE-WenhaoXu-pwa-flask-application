@@ -87,6 +87,7 @@ def login():
                 credentials = sql_db.get_user_by_email(email)
                 if check_password(password, credentials["password_hash"]) == True:
                     session["user"] = credentials["id"]
+                    print(f"Session: {credentials["id"]}")
                     return redirect(url_for("home")) # homepage / userpage
                 else:
                     flash("Incorrect password.", "error")
@@ -248,6 +249,15 @@ def changeUsername():
             new_user = request.form["new_user"]
             id = session["user"]
             try:
+                cred_by_name = sql_db.get_user_by_username(new_user)
+                if cred_by_name["username"] == new_user:
+                    print("Error during username update: Username already exists")
+                    flash("Error: Username is taken!", "error")
+                    return render_template("/change_username.html")
+            except:
+                pass
+
+            try:
                 credentials = sql_db.get_user_by_id(id)
                 if credentials["username"] == old_user:
                     sql_db.update_user_username(new_user, credentials["username"])
@@ -275,6 +285,15 @@ def changeEmail():
             new_email = request.form["new_email"]
             id = session["user"]
             try:
+                cred_by_email = sql_db.get_user_by_email(new_email)
+                if cred_by_email["email"] == new_email:
+                    print("Error during email update: Email already exists")
+                    flash("Error: Email is taken!", "error")
+                    return render_template("/change_email.html")
+            except:
+                pass
+
+            try:
                 credentials = sql_db.get_user_by_id(id)
                 if credentials["email"] == old_email:
                     sql_db.update_user_email(new_email, credentials["username"])
@@ -282,7 +301,7 @@ def changeEmail():
                     return redirect(url_for("home"))
                 else:
                     print("Error during email update: Email not matching")
-                    flash("Error: old email not matching")
+                    flash("Error: Old email not matching")
                     return render_template("/change_email.html")
             except Exception as e:
                 print(f"Error during email update: {e}")
