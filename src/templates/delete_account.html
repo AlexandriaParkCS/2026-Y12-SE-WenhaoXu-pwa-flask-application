@@ -1,20 +1,12 @@
 {% extends 'privateLayout.html' %}
 {% block content %}
-<!-- Flash message -->
-  {% with messages = get_flashed_messages() %}
-    {% if messages %}
-      {% for msg in messages %}
-        <p>{{msg}}</p>
-      {% endfor %}
-    {% endif %}
-  {% endwith %}
 <div class="container">
-    <div class="row">
-        <h1 class="display-1">Delete Account</h1>
-    </div>
+  <div class="row">
+    <h1 class="display-1">Delete Account</h1>
+  </div>
 </div>
-  <div class="container">
-    <div class="row">
+<div class="container">
+  <div class="row">
     <form action="/deleteAccount" method="POST" class="box">
       <div class="col-auto">
         <label name="deleteAcc" class="form-label">Enter Username</label>
@@ -25,6 +17,14 @@
         <input name="password" type="password" class="form-control" id="exampleFormControlInput1">
       </div>
       <br/>
+      <!-- Flash message -->
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          {% for msg in messages %}
+            <p>{{msg}}</p>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
       <div class="col-auto">
         <button type="submit" class="btn btn-primary mb-3">Confirm Deletion</button>
       </div>
