@@ -24,9 +24,13 @@
         <label for="exampleFormControlInput1" class="form-label">New Email</label>
         <input name="new_email" type="email" class="form-control" id="exampleFormControlInput1">
       </div>
+      <div class="col-auto">
+        <label for="exampleFormControlInput1" class="form-label">Enter Password</label>
+        <input name="password" type="password" class="form-control" id="exampleFormControlInput1">
+      </div>
       <br/>
       <div class="col-auto">
-        <button type="submit" class="btn btn-primary mb-3">Submit</button>
+        <button type="submit" class="btn btn-primary mb-3">Confirm</button>
       </div>
       <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />
     </form>

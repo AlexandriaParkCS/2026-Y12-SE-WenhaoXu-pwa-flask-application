@@ -194,7 +194,6 @@ def logout():
     else:
         return redirect(url_for("index"))
 
-# REMEMBER TO CHANGE LOGIC IN TRYEXCEPT IF LOGIN GETS CHANGED TO EITHER BY USER/EMAIL
 @app.route("/deleteAccount", methods=["POST", "GET"])
 def deleteAccount():
     if "user" in session:
@@ -247,6 +246,7 @@ def changeUsername():
         if request.method == "POST":
             old_user = request.form["current_user"]
             new_user = request.form["new_user"]
+            password = request.form["password"]
             id = session["user"]
             try:
                 cred_by_name = sql_db.get_user_by_username(new_user)
@@ -259,6 +259,11 @@ def changeUsername():
 
             try:
                 credentials = sql_db.get_user_by_id(id)
+                if check_password(password, credentials["password_hash"]) != True:
+                    print("Error during username update: Incorrect Password")
+                    flash("Error: Incorrect Password", "error")
+                    return render_template("/change_username.html")
+
                 if credentials["username"] == old_user:
                     sql_db.update_user_username(new_user, credentials["username"])
                     print("Username updated!")
@@ -283,6 +288,7 @@ def changeEmail():
         if request.method == "POST":
             old_email = request.form["current_email"]
             new_email = request.form["new_email"]
+            password = request.form["password"]
             id = session["user"]
             try:
                 cred_by_email = sql_db.get_user_by_email(new_email)
@@ -295,6 +301,11 @@ def changeEmail():
 
             try:
                 credentials = sql_db.get_user_by_id(id)
+                if check_password(password, credentials["password_hash"]) != True:
+                    print("Error during username update: Incorrect Password")
+                    flash("Error: Incorrect Password", "error")
+                    return render_template("/change_email.html")
+
                 if credentials["email"] == old_email:
                     sql_db.update_user_email(new_email, credentials["username"])
                     print("Email Updated!")
