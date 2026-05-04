@@ -86,7 +86,7 @@ def login():
             try:
                 credentials = sql_db.get_user_by_email(email)
                 if check_password(password, credentials["password_hash"]) == True:
-                    session["user"] = email
+                    session["user"] = credentials["id"]
                     return redirect(url_for("home")) # homepage / userpage
                 else:
                     flash("Incorrect password.", "error")
@@ -200,11 +200,11 @@ def deleteAccount():
         if request.method == "POST":
             username = request.form["deleteAcc"]
             password = request.form["password"]
-            email = session["user"] # change later
+            id = session["user"] # change later
             try:
                 userCheck = False
                 pwdCheck = False
-                credentials = sql_db.get_user_by_email(email) # Ensure no delete other ppl password if guessed
+                credentials = sql_db.get_user_by_id(id) # Ensure no delete other ppl password if guessed
                 # Check password, username
                 if credentials["username"] == username: 
                     userCheck = True
@@ -218,9 +218,9 @@ def deleteAccount():
                     flash("Error: Incorrect Password!", "error")
                     return render_template("delete_account.html")
                 else:
-                    print(f"User: '{credentials["username"]}' deleted!")
                     session.pop("user", None)
-                    sql_db.delete_user_by_email(email)
+                    sql_db.delete_user_by_email(credentials["email"])
+                    print(f"User: '{credentials["username"]}' deleted!")
                     return redirect(url_for("index"))
             except Exception as e:
                 print(f"Error deleting account: {e}")
@@ -238,16 +238,17 @@ def changeDetails():
         return render_template("/change.html")
     else:
         return redirect(url_for("index"))
-    
+
+# CHANGE USERNAME
 @app.route("/changeUsername", methods=["POST", "GET"])
 def changeUsername():
     if "user" in session:
         if request.method == "POST":
             old_user = request.form["current_user"]
             new_user = request.form["new_user"]
-            email = session["user"]
+            id = session["user"]
             try:
-                credentials = sql_db.get_user_by_email(email)
+                credentials = sql_db.get_user_by_id(id)
                 if credentials["username"] == old_user:
                     sql_db.update_user_username(new_user, credentials["username"])
                     print("Username updated!")
@@ -265,15 +266,16 @@ def changeUsername():
     else:
         return redirect(url_for("index"))
 
+# CHANGE EMAIL
 @app.route("/changeEmail", methods=["POST", "GET"])
 def changeEmail():
     if "user" in session:
         if request.method == "POST":
             old_email = request.form["current_email"]
             new_email = request.form["new_email"]
-            email = session["user"]
+            id = session["user"]
             try:
-                credentials = sql_db.get_user_by_email(email)
+                credentials = sql_db.get_user_by_id(id)
                 if credentials["email"] == old_email:
                     sql_db.update_user_email(new_email, credentials["username"])
                     print("Email Updated!")
@@ -291,15 +293,16 @@ def changeEmail():
     else:
         return redirect(url_for("index"))
 
+# CHANGE PASSWORD
 @app.route("/changePassword", methods=["POST", "GET"])
 def changePassword():
     if "user" in session:
         if request.method == "POST":
             old_password = request.form["current_password"]
             new_password = request.form["new_password"]
-            email = session["user"]
+            id = session["user"]
             try:
-                credentials = sql_db.get_user_by_email(email)
+                credentials = sql_db.get_user_by_id(id)
                 if check_password(old_password, credentials["password_hash"]) == True:
                     new_password = hash_password(new_password)
                     sql_db.update_user_password(new_password, credentials["username"])
