@@ -187,8 +187,11 @@ def settings():
 
 @app.route("/logout", methods=["POST", "GET"])
 def logout():
-    session.pop("user", None)
-    return redirect(url_for("index"))
+    if "user" in session:
+        session.pop("user", None)
+        return redirect(url_for("index"))
+    else:
+        return redirect(url_for("index"))
 
 # REMEMBER TO CHANGE LOGIC IN TRYEXCEPT IF LOGIN GETS CHANGED TO EITHER BY USER/EMAIL
 @app.route("/deleteAccount", methods=["POST", "GET"])
@@ -224,9 +227,96 @@ def deleteAccount():
                 flash(f"Error deleting account: {e}", "error")
                 return render_template("delete_account.html")
         else:
-            return render_template("delete_account.html") # In session
+            return render_template("/delete_account.html") # In session
     else: 
         return redirect(url_for("index")) # Not in session 
+
+# CHANGE USER DETAILS
+@app.route("/changedetails", methods=["POST", "GET"])
+def changeDetails():
+    if "user" in session:
+        return render_template("/change.html")
+    else:
+        return redirect(url_for("index"))
+    
+@app.route("/changeUsername", methods=["POST", "GET"])
+def changeUsername():
+    if "user" in session:
+        if request.method == "POST":
+            old_user = request.form["current_user"]
+            new_user = request.form["new_user"]
+            email = session["user"]
+            try:
+                credentials = sql_db.get_user_by_email(email)
+                if credentials["username"] == old_user:
+                    sql_db.update_user_username(new_user, credentials["username"])
+                    print("Username updated!")
+                    return redirect(url_for("home"))
+                else:
+                    print("Error during username update: Username not matching")
+                    flash("Error: old username not matching", "error")
+                    return render_template("/change_username.html")
+            except Exception as e:
+                print(f"Error during username update: {e}")
+                flash("Something went wrong", "error")
+                return render_template("/change_username.html")
+        else:
+            return render_template("/change_username.html")
+    else:
+        return redirect(url_for("index"))
+
+@app.route("/changeEmail", methods=["POST", "GET"])
+def changeEmail():
+    if "user" in session:
+        if request.method == "POST":
+            old_email = request.form["current_email"]
+            new_email = request.form["new_email"]
+            email = session["user"]
+            try:
+                credentials = sql_db.get_user_by_email(email)
+                if credentials["email"] == old_email:
+                    sql_db.update_user_email(new_email, credentials["username"])
+                    print("Email Updated!")
+                    return redirect(url_for("home"))
+                else:
+                    print("Error during email update: Email not matching")
+                    flash("Error: old email not matching")
+                    return render_template("/change_email.html")
+            except Exception as e:
+                print(f"Error during email update: {e}")
+                flash("Something went wrong", "error")
+                return render_template("/change_email.html")
+        else:
+            return render_template("/change_email.html")
+    else:
+        return redirect(url_for("index"))
+
+@app.route("/changePassword", methods=["POST", "GET"])
+def changePassword():
+    if "user" in session:
+        if request.method == "POST":
+            old_password = request.form["current_password"]
+            new_password = request.form["new_password"]
+            email = session["user"]
+            try:
+                credentials = sql_db.get_user_by_email(email)
+                if check_password(old_password, credentials["password_hash"]) == True:
+                    new_password = hash_password(new_password)
+                    sql_db.update_user_password(new_password, credentials["username"])
+                    print("Password updated!")
+                    return redirect(url_for("home"))
+                else:
+                    print("Error during password update: Password not matching")
+                    flash("Error: old password not matching")
+                    return render_template("/change_password.html")
+            except Exception as e:
+                print(f"Error during password update: {e}")
+                flash("Something went wrong.", "error")
+                return render_template("/change_password.html")
+        else:
+            return render_template("/change_password.html")
+    else:
+        return redirect(url_for("index"))
 
 # Endpoint for logging CSP violations
 @app.route("/csp_report", methods=["POST"])

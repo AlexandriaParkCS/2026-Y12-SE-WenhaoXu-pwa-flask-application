@@ -103,7 +103,7 @@ class SqlDb(object):
             if conn: 
                 conn.close()
 
-    def update_user_email(self, username, new_email):
+    def update_user_email(self, new_email, username):
         conn = None
         try:
             conn = self._connect()
@@ -111,6 +111,54 @@ class SqlDb(object):
             cursor.execute(
                 "UPDATE users SET email = ? WHERE username = ?",
                 (new_email, username)
+            )
+            conn.commit()
+            if cursor.rowcount:
+                return self.get_user_by_username(username)
+            else:
+                print("User not found.")
+        except sqlite3.IntegrityError:
+            print("Error: Email already in use.")
+        except sqlite3.Error as e:
+            print(f"Database error during update: {e}")
+        finally:
+            if cursor: 
+                cursor.close()
+            if conn: 
+                conn.close()
+
+    def update_user_username(self, new_username, username):
+        conn = None
+        try:
+            conn = self._connect()
+            cursor = conn.cursor()
+            cursor.execute(
+                "UPDATE users SET username = ? WHERE username = ?",
+                (new_username, username)
+            )
+            conn.commit()
+            if cursor.rowcount:
+                return self.get_user_by_username(username)
+            else:
+                print("User not found.")
+        except sqlite3.IntegrityError:
+            print("Error: Email already in use.")
+        except sqlite3.Error as e:
+            print(f"Database error during update: {e}")
+        finally:
+            if cursor: 
+                cursor.close()
+            if conn: 
+                conn.close()        
+
+    def update_user_password(self, new_password, username):
+        conn = None
+        try:
+            conn = self._connect()
+            cursor = conn.cursor()
+            cursor.execute(
+                "UPDATE users SET password_hash = ? WHERE username = ?",
+                (new_password, username)
             )
             conn.commit()
             if cursor.rowcount:
