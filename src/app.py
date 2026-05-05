@@ -200,7 +200,7 @@ def deleteAccount():
         if request.method == "POST":
             username = request.form["deleteAcc"]
             password = request.form["password"]
-            id = session["user"] # change later
+            id = session["user"]
             try:
                 userCheck = False
                 pwdCheck = False
@@ -348,6 +348,16 @@ def changePassword():
                 return render_template("/change_password.html")
         else:
             return render_template("/change_password.html")
+    else:
+        return redirect(url_for("index"))
+
+@app.route("/create_chore", methods=["POST", "GET"])
+def creation():
+    if "user" in session:
+        if request.method == "POST":
+            pass
+        else:
+            return render_template("/chore_create")
     else:
         return redirect(url_for("index"))
 

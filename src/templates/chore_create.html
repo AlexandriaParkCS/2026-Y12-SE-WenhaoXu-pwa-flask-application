@@ -1,0 +1,35 @@
+{% extends 'privateLayout.html' %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <h1>Create Chore</h1>
+  </div>
+</div>
+<div class="container">
+  <div class="row">
+    <form action="/create_chore" method="POST" class="box">
+      <div class="col-auto">
+        <label name="exampleFormControlInput1" class="form-label">Task Name</label>
+        <input name="task" type="text" class="form-control" id="exampleFormControlInput1" placeholder="name@example.com">
+      </div>
+      <div class="col-auto">
+        <label for="exampleFormControlInput1" class="form-label">Description</label>
+        <input name="description" type="text" class="form-control" id="exampleFormControlInput1">
+      </div>
+      <br/>
+      <!-- Flash message -->
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for msg in messages %}
+              <p>{{msg}}</p>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+      <div class="col-auto">
+        <button type="submit" class="btn btn-primary mb-3">Submit</button>
+      </div>
+      <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />
+    </form>
+  </div>
+</div>
+{% endblock %}

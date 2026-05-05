@@ -41,6 +41,7 @@ class SqlDb(object):
             if conn: 
                 conn.close()
 
+# User functions
     def create_user(self, username, email, password_hash):
         conn = None
         try:
@@ -235,6 +236,48 @@ class SqlDb(object):
             if conn: 
                 conn.close()
 
+# Chore sheet
+    def create_chore(self, name, description):
+        conn = None
+        try:
+            conn = self._connect()
+            cursor = conn.cursor()
+            cursor.execute(
+                "INSERT INTO chores (name, description) VALUES (?, ?)",
+                (name, description)
+            )
+            conn.commit()
+            user_id = cursor.lastrowid
+            return {"id": user_id, "username": name, "description": description}
+        except sqlite3.IntegrityError:
+            print("Error: chore already exists.")
+        except sqlite3.Error as e:
+            print(f"Database error during chore creation: {e}")
+        finally:
+            if cursor: 
+                cursor.close()
+            if conn: 
+                conn.close()
+
+    def get_chores_by_name(self, name):
+        try:
+            conn = self._connect()
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT id, name, description, user_id FROM chores WHERE username = ?",
+                (name,)
+            )
+            row = cursor.fetchone()
+            if row:
+                return {"id": row[0], "name": row[1], "description": row[2], "user_id": row[3]}
+        except sqlite3.Error as e:
+            print(f"Database error during chore retrieval: {e}")
+        finally:
+            if cursor: 
+                cursor.close()
+            if conn: 
+                conn.close()
+
 # Example usage
 if __name__ == "__main__":
     db = SqlDb("runtime/db/test.db")
@@ -254,3 +297,6 @@ if __name__ == "__main__":
     # Delete
     success = db.delete_user_by_user("emiltech")
     print("Deleted:", success)
+
+    chore = db.create_chore("Do Software work", "I have software due soon!")
+    print("Created:", chore)
