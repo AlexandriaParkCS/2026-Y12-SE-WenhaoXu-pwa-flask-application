@@ -17,15 +17,15 @@ if bcrypt.checkpw(x, hash):
 else:
     print("False")
 '''
+class encrypt:
+    def hash_password(password):
+        return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
-def hash_password(password):
-    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-
-def check_password(password, hashed):
-    if bcrypt.checkpw(password.encode("utf-8"), hashed):
-        return True
-    else:
-        return False
+    def check_password(password, hashed):
+        if bcrypt.checkpw(password.encode("utf-8"), hashed):
+            return True
+        else:
+            return False
 
 # if bcrypt.checkpw(input("ENTER PASSWORD: ").encode("utf-8"), hash_password("SecretPassword")): print("Y")
 # else: print("N")

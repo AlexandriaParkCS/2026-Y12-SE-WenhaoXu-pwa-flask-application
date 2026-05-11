@@ -13,7 +13,7 @@ from datetime import timedelta
 
 from sqldb import SqlDb
 from validation import validate
-from encrypt import hash_password, check_password
+from encryption import encrypt
 
 # OR
 # from ormdb import OrmDb
@@ -73,7 +73,10 @@ def index():
 # find someway to deal w/ this
 @app.route("/privacy", methods=["GET"])
 def privacy():
-    return render_template("/privacy.html")
+    if "user" not in session:
+        return render_template("/privacy.html")
+    else:
+        return render_template("/privacy2.html")
 
 # Perhaps change to two screens; login by email or login by username
 @app.route("/login", methods=["POST", "GET"])
@@ -85,7 +88,7 @@ def login():
             password = request.form["password"] #(TEST PASSWORD: Test1234&%)
             try:
                 credentials = sql_db.get_user_by_email(email)
-                if check_password(password, credentials["password_hash"]) == True:
+                if encrypt.check_password(password, credentials["password_hash"]) == True:
                     session["user"] = credentials["id"]
                     print(f"Session: {credentials["id"]}")
                     return redirect(url_for("home")) # homepage / userpage
@@ -152,7 +155,7 @@ def sign_up():
             password = validate.sanitise(password)
 
             # hash password (TEST PASSWORD: Test1234&%)
-            pwd_hash = hash_password(password)
+            pwd_hash = encrypt.hash_password(password)
             # creation of user
             try:
                 sql_db.create_user(username, email, pwd_hash)
@@ -208,7 +211,7 @@ def deleteAccount():
                 # Check password, username
                 if credentials["username"] == username: 
                     userCheck = True
-                if check_password(password, credentials["password_hash"]) == True: 
+                if encrypt.check_password(password, credentials["password_hash"]) == True: 
                     pwdCheck = True
 
                 if userCheck == False: # match username w/ database
@@ -248,6 +251,7 @@ def changeUsername():
             new_user = request.form["new_user"]
             password = request.form["password"]
             id = session["user"]
+            # CHECK IF REPEAT NAME
             try:
                 cred_by_name = sql_db.get_user_by_username(new_user)
                 if cred_by_name["username"] == new_user:
@@ -257,13 +261,22 @@ def changeUsername():
             except:
                 pass
 
+            # VALIDATE + SANITISE NEW NAME
+            NameValid = validate.vName(new_user)
+            if NameValid != True:
+                print(f"Name Error: {NameValid}")
+                flash(NameValid, "error")
+                return render_template("/signup.html")
+            new_user = validate.sanitise(new_user)
+
+            # CHECK PASSWORD
             try:
                 credentials = sql_db.get_user_by_id(id)
-                if check_password(password, credentials["password_hash"]) != True:
+                if encrypt.check_password(password, credentials["password_hash"]) != True:
                     print("Error during username update: Incorrect Password")
                     flash("Error: Incorrect Password", "error")
                     return render_template("/change_username.html")
-
+            # CHECK IF OLD USERNAME IS SAME
                 if credentials["username"] == old_user:
                     sql_db.update_user_username(new_user, credentials["username"])
                     print("Username updated!")
@@ -290,6 +303,7 @@ def changeEmail():
             new_email = request.form["new_email"]
             password = request.form["password"]
             id = session["user"]
+            # CHECK IF REPEAT EMAIL
             try:
                 cred_by_email = sql_db.get_user_by_email(new_email)
                 if cred_by_email["email"] == new_email:
@@ -299,13 +313,22 @@ def changeEmail():
             except:
                 pass
 
+            # VALID + SANITISE NEW EMAIL
+            EmailValid = validate.vEmail(new_email)
+            if EmailValid != True:
+                print(f"Email Error: {EmailValid}")
+                flash(EmailValid, "error")
+                return render_template("/signup.html")
+            new_email = validate.sanitise(new_email)
+
+            # CHECK PASSWORD
             try:
                 credentials = sql_db.get_user_by_id(id)
-                if check_password(password, credentials["password_hash"]) != True:
+                if encrypt.check_password(password, credentials["password_hash"]) != True:
                     print("Error during username update: Incorrect Password")
                     flash("Error: Incorrect Password", "error")
                     return render_template("/change_email.html")
-
+            # CHECK IF OLD USERNAME IS SAME
                 if credentials["email"] == old_email:
                     sql_db.update_user_email(new_email, credentials["username"])
                     print("Email Updated!")
@@ -331,10 +354,18 @@ def changePassword():
             old_password = request.form["current_password"]
             new_password = request.form["new_password"]
             id = session["user"]
+            # VALIDATE + SANITISE PASSWORD
+            PwdValid = validate.vPassword(new_password)
+            if PwdValid != True:
+                print(f"Email Error: {PwdValid}")
+                flash(PwdValid, "error")
+                return render_template("/signup.html")
+            new_password = validate.sanitise(new_password)
+            # CHECK OLD PASSWORD
             try:
                 credentials = sql_db.get_user_by_id(id)
-                if check_password(old_password, credentials["password_hash"]) == True:
-                    new_password = hash_password(new_password)
+                if encrypt.check_password(old_password, credentials["password_hash"]) == True:
+                    new_password = encrypt.hash_password(new_password)
                     sql_db.update_user_password(new_password, credentials["username"])
                     print("Password updated!")
                     return redirect(url_for("home"))

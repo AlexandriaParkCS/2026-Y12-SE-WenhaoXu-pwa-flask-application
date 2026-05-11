@@ -278,6 +278,25 @@ class SqlDb(object):
             if conn: 
                 conn.close()
 
+    def delete_chore(self, name):
+        try:
+            conn = self._connect()
+            cursor = conn.cursor()
+            cursor.execute(
+                "DELETE FROM chores WHERE email = ? AND user_id = ?",
+                (name,)
+            )
+            row = cursor.fetchone()
+            if row:
+                return {"id": row[0], "name": row[1], "description": row[2], "user_id": row[3]}
+        except sqlite3.Error as e:
+            print(f"Database error during chore retrieval: {e}")
+        finally:
+            if cursor: 
+                cursor.close()
+            if conn: 
+                conn.close()        
+
 # Example usage
 if __name__ == "__main__":
     db = SqlDb("runtime/db/test.db")
