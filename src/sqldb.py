@@ -237,14 +237,14 @@ class SqlDb(object):
                 conn.close()
 
 # Chore sheet
-    def create_chore(self, name, description):
+    def create_chore(self, name, description, user_id):
         conn = None
         try:
             conn = self._connect()
             cursor = conn.cursor()
             cursor.execute(
-                "INSERT INTO chores (name, description) VALUES (?, ?)",
-                (name, description)
+                "INSERT INTO chores (name, description, user_id) VALUES (?, ?, ?)",
+                (name, description, user_id)
             )
             conn.commit()
             user_id = cursor.lastrowid
@@ -278,13 +278,13 @@ class SqlDb(object):
             if conn: 
                 conn.close()
 
-    def delete_chore(self, name):
+    def delete_chore(self, name, user_id):
         try:
             conn = self._connect()
             cursor = conn.cursor()
             cursor.execute(
-                "DELETE FROM chores WHERE email = ? AND user_id = ?",
-                (name,)
+                "DELETE FROM chores WHERE name = ? AND user_id = ?",
+                (name, user_id)
             )
             row = cursor.fetchone()
             if row:

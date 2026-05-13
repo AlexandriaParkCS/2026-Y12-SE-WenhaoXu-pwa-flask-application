@@ -180,6 +180,7 @@ def home():
     else:
         redirect(url_for("login"))
 
+# dashboard
 @app.route("/settings", methods=["POST", "GET"])
 def settings():
     if "user" in session:
@@ -197,6 +198,7 @@ def logout():
     else:
         return redirect(url_for("index"))
 
+# DELETE ACCOUNT
 @app.route("/deleteAccount", methods=["POST", "GET"])
 def deleteAccount():
     if "user" in session:
@@ -386,11 +388,27 @@ def changePassword():
 def creation():
     if "user" in session:
         if request.method == "POST":
-            pass
+            task = request.form["task"]
+            desc = request.form["description"]
+            # maybe add a validation
+            task = validate.sanitise(task)
+            desc = validate.sanitise(desc)
+
+            sql_db.create_chore(task, desc, session["user"])
+            # on completion: return to dashboard
+            return redirect(url_for("home"))
         else:
-            return render_template("/chore_create")
+            return render_template("/chore_create.html")
     else:
         return redirect(url_for("index"))
+
+@app.route("/delete_chore", methods=["POST", "GET"])
+def chore_delete():
+    if "user" in session:
+        pass
+    else:
+        return redirect(url_for("index"))
+    
 
 # Endpoint for logging CSP violations
 @app.route("/csp_report", methods=["POST"])
