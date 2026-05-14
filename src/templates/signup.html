@@ -10,33 +10,33 @@
   <div class="row">
     <form action="/signup" method="POST" class="box">
       <div class="col-auto">
-        <label name="SignUpUSERNAME" class="form-label">Username</label>
-        <input name="username" type="text" class="form-control" id="exampleFormControlInput1" placeholder="myusername">
+        <label for="signup_username" class="form-label">Username</label>
+        <input name="username" type="text" class="form-control" id="signup_username" placeholder="myusername">
       </div>
       <div class="col-auto">
-        <label name="SignUpEMAIL" class="form-label">Email address</label>
-        <input name="email" type="email" class="form-control" id="exampleFormControlInput1" placeholder="name@example.com">
+        <label for="signup_email" class="form-label">Email address</label>
+        <input name="email" type="email" class="form-control" id="signup_email" placeholder="name@example.com">
       </div>
       <div class="col-auto">
-        <label for="SignUpPASSWORD" class="form-label">Password</label>
-        <input name="password" type="password" class="form-control" id="exampleFormControlInput1">
+        <label for="signup_password" class="form-label">Password</label>
+        <input name="password" type="password" class="form-control" id="signup_password">
       </div>
-      <br/>
       {% with messages = get_flashed_messages() %}
         {% if messages %}
           {% for msg in messages %}
-            <p>{{msg}}</p>
+            <p class="text-danger">{{msg}}</p>
           {% endfor %}
         {% endif %}
       {% endwith %}
+      <div>
+        <a href="login">Login instead?</a>
+      </div>
+      <br/>
       <div class="col-auto">
         <button type="submit" class="btn btn-primary mb-3">Submit</button>
       </div>
       <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />
     </form>
-    <div>
-      <a href="login">Login instead?</a>
-    </div>
   </div>
 </div>
 {% endblock %}

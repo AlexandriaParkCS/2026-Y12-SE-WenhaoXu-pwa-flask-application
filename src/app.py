@@ -384,7 +384,7 @@ def changePassword():
     else:
         return redirect(url_for("index"))
 
-@app.route("/create_chore", methods=["POST", "GET"])
+@app.route("/dashboard", methods=["POST", "GET"])
 def creation():
     if "user" in session:
         if request.method == "POST":
@@ -399,17 +399,9 @@ def creation():
             return redirect(url_for("home"))
         else:
             chores = sql_db.get_all_chores(session["user"])
-            return render_template("/chore_create.html", chores=chores) # chores=chores tells the page
+            return render_template("/dashboard.html", chores=chores) # chores=chores tells the page
     else:
         return redirect(url_for("index"))
-
-@app.route("/delete_chore", methods=["POST", "GET"])
-def chore_delete():
-    if "user" in session:
-        pass
-    else:
-        return redirect(url_for("index"))
-    
 
 # Endpoint for logging CSP violations
 @app.route("/csp_report", methods=["POST"])
