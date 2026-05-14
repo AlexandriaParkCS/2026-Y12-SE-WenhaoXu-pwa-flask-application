@@ -28,10 +28,23 @@
         <div class="container">
           <div class="row">
             <form action="/dashboard" method="POST" class="box">
+
               <div class="col-auto">
                 <label for="create_chorename" class="form-label">Task Name</label>
                 <input name="task" type="text" class="form-control" id="create_chorename">
               </div>
+
+              <label for="create_choreweekday" class="form-label">Select day of the week</label>
+              <select name="weekday" class="form-select" id="create_choreweekday">
+                <option>Monday</option>
+                <option>Tuesday</option>
+                <option>Wednesday</option>
+                <option>Thursday</option>
+                <option>Friday</option>
+                <option>Saturday</option>
+                <option>Sunday</option>
+              </select>
+
               <div class="col-auto">
                 <label for="create_choredesc" class="form-label">Description</label>
                 <textarea name="description" type="text" class="form-control" rows="3" id="create_choredesc"></textarea>

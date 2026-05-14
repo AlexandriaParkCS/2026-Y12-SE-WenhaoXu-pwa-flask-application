@@ -1,5 +1,5 @@
 import sqlite3
-import bcrypt
+
 class SqlDb(object):
 
     def __init__(self, db_path="db/app.db"):
@@ -29,6 +29,9 @@ class SqlDb(object):
                 name TEXT UNIQUE NOT NULL,
                 description TEXT,
                 user_id INTEGER,
+                task_completion INTEGER DEFAULT 0,
+                weekday INTEGER,
+                time_slot TEXT,
                 FOREIGN KEY (user_id) REFERENCES users(id)
                 )
             """)
@@ -237,14 +240,14 @@ class SqlDb(object):
                 conn.close()
 
 # Chore sheet
-    def create_chore(self, name, description, user_id):
+    def create_chore(self, name, description, weekday, user_id):
         conn = None
         try:
             conn = self._connect()
             cursor = conn.cursor()
             cursor.execute(
-                "INSERT INTO chores (name, description, user_id) VALUES (?, ?, ?)",
-                (name, description, user_id)
+                "INSERT INTO chores (name, description, weekday, user_id) VALUES (?, ?, ?, ?)",
+                (name, description, weekday, user_id)
             )
             conn.commit()
             user_id = cursor.lastrowid
@@ -279,6 +282,26 @@ class SqlDb(object):
             if conn: 
                 conn.close()
 
+    def get_all_chores_by_day(self, user_id, weekday):
+        try:
+            conn = self._connect()
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT name, description FROM chores WHERE user_id = ? AND weekday = ?",
+                (user_id, weekday)
+            )
+            row = cursor.fetchall()
+            #if row:
+            #    return {"id": row[0], "name": row[1], "description": row[2], "user_id": row[3]}
+            return row
+        except sqlite3.Error as e:
+            print(f"Database error during chore retrieval: {e}")
+        finally:
+            if cursor: 
+                cursor.close()
+            if conn: 
+                conn.close()
+
     def delete_chore(self, name, user_id):
         try:
             conn = self._connect()
@@ -298,6 +321,7 @@ class SqlDb(object):
             if conn: 
                 conn.close()        
 
+'''
 # Example usage
 if __name__ == "__main__":
     db = SqlDb("runtime/db/test.db")
@@ -320,3 +344,4 @@ if __name__ == "__main__":
 
     chore = db.create_chore("Do Software work", "I have software due soon!")
     print("Created:", chore)
+'''

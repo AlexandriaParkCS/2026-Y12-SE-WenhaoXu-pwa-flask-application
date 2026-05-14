@@ -9,7 +9,8 @@ from flask import session
 from flask import flash
 from flask_wtf import CSRFProtect
 from flask_csp.csp import csp_header
-from datetime import timedelta
+from datetime import datetime
+from datehandler import timeconvert
 
 from sqldb import SqlDb
 from validation import validate
@@ -176,7 +177,9 @@ def sgnconfirm():
 @app.route("/home", methods=["POST", "GET"]) #user page / homepage
 def home():
     if "user" in session:
-        return render_template("userpage.html")
+        weekday = datetime.now().weekday()
+        chores = sql_db.get_all_chores_by_day(session["user"], weekday)
+        return render_template("userpage.html", chores=chores)
     else:
         redirect(url_for("login"))
 
@@ -390,27 +393,29 @@ def creation():
         if request.method == "POST":
             task = request.form["task"]
             desc = request.form["description"]
-            # maybe add a validation
+            weekday = request.form["weekday"]
+
+            chores = sql_db.get_all_chores(session["user"])
+            # Validations
             taskValid = validate.vTask(task)
             if taskValid != True:
                 print(f"Error creating task: {taskValid}")
                 flash(taskValid, "error")
-                chores = sql_db.get_all_chores(session["user"])
                 return render_template("/dashboard.html", chores=chores)
             
             descValid = validate.vDesc(desc)
             if descValid != True:
                 print(f"Error creating task: {descValid}")
                 flash(descValid, "error")
-                chores = sql_db.get_all_chores(session["user"])
                 return render_template("/dashboard.html", chores=chores)
-
+            
+            weekday = timeconvert.convertDate(weekday)
             task = validate.sanitise(task)
             desc = validate.sanitise(desc)
 
-            sql_db.create_chore(task, desc, session["user"])
+            sql_db.create_chore(task, desc, weekday, session["user"])
             # on completion: return to dashboard
-            return redirect(url_for("home"))
+            return render_template("/dashboard.html", chores=chores)
         else:
             chores = sql_db.get_all_chores(session["user"])
             return render_template("/dashboard.html", chores=chores) # chores=chores tells the page

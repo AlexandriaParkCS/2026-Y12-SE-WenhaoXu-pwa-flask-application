@@ -11,4 +11,22 @@
   </div>
 </div>
 
+<h4>Today's tasks</h4>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Task</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for chore in chores %}
+        <tr>
+          <td>{{ chore[0] }}</td>
+          <td>{{ chore[1] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
 {% endblock %}
