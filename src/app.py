@@ -398,7 +398,8 @@ def creation():
             # on completion: return to dashboard
             return redirect(url_for("home"))
         else:
-            return render_template("/chore_create.html")
+            chores = sql_db.get_all_chores(session["user"])
+            return render_template("/chore_create.html", chores=chores) # chores=chores tells the page
     else:
         return redirect(url_for("index"))
 

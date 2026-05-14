@@ -5,7 +5,7 @@
   Create New Chore
 </button>
 <!-- Modal for creating chore -->
-<div class="modal" id="createchore">
+<div class="modal fade" id="createchore">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       
@@ -26,14 +26,14 @@
               </div>
               <div class="col-auto">
                 <label for="exampleFormControlInput1" class="form-label">Description</label>
-                <input name="description" type="text" class="form-control" id="exampleFormControlInput1">
+                <textarea name="description" type="text" class="form-control" rows="3" id="exampleFormControlInput1"></textarea>
               </div>
               <br/>
               <!-- Flash message -->
               {% with messages = get_flashed_messages() %}
                 {% if messages %}
                   {% for msg in messages %}
-                    <p>{{msg}}</p>
+                    <p class="text-danger">{{msg}}</p>
                   {% endfor %}
                 {% endif %}
               {% endwith %}
@@ -54,4 +54,22 @@
     </div>
   </div>
 </div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Task</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for chore in chores %}
+        <tr>
+          <td>{{ chore[0] }}</td>
+          <td>{{ chore[1] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
 {% endblock %}

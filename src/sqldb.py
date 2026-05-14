@@ -259,17 +259,18 @@ class SqlDb(object):
             if conn: 
                 conn.close()
 
-    def get_chores_by_name(self, name):
+    def get_all_chores(self, user_id):
         try:
             conn = self._connect()
             cursor = conn.cursor()
             cursor.execute(
-                "SELECT id, name, description, user_id FROM chores WHERE username = ?",
-                (name,)
+                "SELECT name, description FROM chores WHERE user_id= ?",
+                (user_id,)
             )
-            row = cursor.fetchone()
-            if row:
-                return {"id": row[0], "name": row[1], "description": row[2], "user_id": row[3]}
+            row = cursor.fetchall()
+            #if row:
+            #    return {"id": row[0], "name": row[1], "description": row[2], "user_id": row[3]}
+            return row
         except sqlite3.Error as e:
             print(f"Database error during chore retrieval: {e}")
         finally:
