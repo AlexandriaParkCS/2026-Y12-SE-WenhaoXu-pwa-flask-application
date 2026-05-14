@@ -391,6 +391,20 @@ def creation():
             task = request.form["task"]
             desc = request.form["description"]
             # maybe add a validation
+            taskValid = validate.vTask(task)
+            if taskValid != True:
+                print(f"Error creating task: {taskValid}")
+                flash(taskValid, "error")
+                chores = sql_db.get_all_chores(session["user"])
+                return render_template("/dashboard.html", chores=chores)
+            
+            descValid = validate.vDesc(desc)
+            if descValid != True:
+                print(f"Error creating task: {descValid}")
+                flash(descValid, "error")
+                chores = sql_db.get_all_chores(session["user"])
+                return render_template("/dashboard.html", chores=chores)
+
             task = validate.sanitise(task)
             desc = validate.sanitise(desc)
 

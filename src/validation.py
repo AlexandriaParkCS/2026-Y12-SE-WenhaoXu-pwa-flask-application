@@ -67,6 +67,29 @@ class validate:
         elif pwdValid == False: return "Password must include 8 characters, one lowercase, one uppercase, one number and one special character"
         else: return True
 
+    def vTask(task):
+        taskNotNull = True
+        taskValid = True
+
+        if not task:
+            taskNotNull = False
+
+        if not re.fullmatch(r"[\x20-\x7E]{1,50}", task):
+            taskValid = False
+        
+        if taskNotNull == False: return "Task name cannot be empty!"
+        elif taskValid == False: return "Task name has to be only letters and integers between 1-50 letters."
+        else: return True
+
+    def vDesc(desc):
+        if not desc:
+            return True
+        
+        if not re.fullmatch(r"[\x20-\x7E]{1,300}", desc):
+            return "Description must only include letters, integers and be within 300 characters."
+        
+        return True
+
 # TESTING
 '''
 print(validate.vName("yum"))
