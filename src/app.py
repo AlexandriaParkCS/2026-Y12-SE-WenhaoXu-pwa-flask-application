@@ -180,7 +180,11 @@ def home():
         weekday = datetime.now().weekday()
         chores = sql_db.get_all_chores_by_day(session["user"], weekday)
         weekday = timeconvert.convertInt(weekday)
-        return render_template("userpage.html", chores=chores, weekday=weekday)
+
+        credentials = sql_db.get_user_by_id(session["user"])
+        user = credentials["username"]
+
+        return render_template("userpage.html", chores=chores, weekday=weekday, usr=user)
     else:
         redirect(url_for("login"))
 
@@ -391,10 +395,17 @@ def changePassword():
 @app.route("/dashboard", methods=["POST", "GET"])
 def creation():
     if "user" in session:
-        if request.method == "POST":
+        if request.method == "POST": # Create Chores
+            # Task name and description
             task = request.form["task"]
             desc = request.form["description"]
+            # Time
             weekday = request.form["weekday"]
+            meridiem = request.form["meridiem"] 
+            time_hour = request.form["timehour"]
+            time_minute = request.form["timeminute"]
+            # Conversion to 24hour time
+            time_hour = timeconvert.convertMeridiem(time_hour, meridiem)
 
             chores = sql_db.get_all_chores(session["user"])
             chores = timeconvert.convertTupleList(chores)
@@ -412,17 +423,18 @@ def creation():
                 flash(descValid, "error")
                 return render_template("/dashboard.html", chores=chores)
             
+            # Sanitisations
             weekday = timeconvert.convertDate(weekday)
             task = validate.sanitise(task)
             desc = validate.sanitise(desc)
+            sql_db.create_chore(task, desc, weekday, time_hour, time_minute, session["user"])
 
-            sql_db.create_chore(task, desc, weekday, session["user"])
-
+            # Display again
             chores = sql_db.get_all_chores(session["user"]) # do this so its up to date
             chores = timeconvert.convertTupleList(chores)
-            # on completion: return to dashboard
             return render_template("/dashboard.html", chores=chores)
         else:
+            # Display
             chores = sql_db.get_all_chores(session["user"])
             chores = timeconvert.convertTupleList(chores)
             return render_template("/dashboard.html", chores=chores) # chores=chores tells the page

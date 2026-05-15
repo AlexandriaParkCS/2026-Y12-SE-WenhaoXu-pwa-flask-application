@@ -31,7 +31,8 @@ class SqlDb(object):
                 user_id INTEGER,
                 task_completion INTEGER DEFAULT 0,
                 weekday INTEGER,
-                time_slot TEXT,
+                time_hour INTEGER,
+                time_minute INTEGER,
                 FOREIGN KEY (user_id) REFERENCES users(id)
                 )
             """)
@@ -240,14 +241,14 @@ class SqlDb(object):
                 conn.close()
 
 # Chore sheet
-    def create_chore(self, name, description, weekday, user_id):
+    def create_chore(self, name, description, weekday, time_hour, time_minute, user_id):
         conn = None
         try:
             conn = self._connect()
             cursor = conn.cursor()
             cursor.execute(
-                "INSERT INTO chores (name, description, weekday, user_id) VALUES (?, ?, ?, ?)",
-                (name, description, weekday, user_id)
+                "INSERT INTO chores (name, description, weekday, time_hour, time_minute, user_id) VALUES (?, ?, ?, ?, ?, ?)",
+                (name, description, weekday, time_hour, time_minute, user_id)
             )
             conn.commit()
             user_id = cursor.lastrowid
@@ -267,7 +268,7 @@ class SqlDb(object):
             conn = self._connect()
             cursor = conn.cursor()
             cursor.execute(
-                "SELECT name, description, weekday, time_slot FROM chores WHERE user_id= ?",
+                "SELECT name, description, weekday, time_hour, time_minute FROM chores WHERE user_id= ? ORDER BY weekday, time_hour, time_minute",
                 (user_id,)
             )
             row = cursor.fetchall()
@@ -289,8 +290,6 @@ class SqlDb(object):
                 (user_id, weekday)
             )
             row = cursor.fetchall()
-            #if row:
-            #    return {"id": row[0], "name": row[1], "description": row[2], "user_id": row[3]}
             return row
         except sqlite3.Error as e:
             print(f"Database error during chore retrieval: {e}")
