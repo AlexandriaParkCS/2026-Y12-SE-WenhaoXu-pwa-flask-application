@@ -179,7 +179,8 @@ def home():
     if "user" in session:
         weekday = datetime.now().weekday()
         chores = sql_db.get_all_chores_by_day(session["user"], weekday)
-        return render_template("userpage.html", chores=chores)
+        weekday = timeconvert.convertInt(weekday)
+        return render_template("userpage.html", chores=chores, weekday=weekday)
     else:
         redirect(url_for("login"))
 
@@ -396,6 +397,8 @@ def creation():
             weekday = request.form["weekday"]
 
             chores = sql_db.get_all_chores(session["user"])
+            chores = timeconvert.convertTupleList(chores)
+
             # Validations
             taskValid = validate.vTask(task)
             if taskValid != True:
@@ -414,10 +417,14 @@ def creation():
             desc = validate.sanitise(desc)
 
             sql_db.create_chore(task, desc, weekday, session["user"])
+
+            chores = sql_db.get_all_chores(session["user"]) # do this so its up to date
+            chores = timeconvert.convertTupleList(chores)
             # on completion: return to dashboard
             return render_template("/dashboard.html", chores=chores)
         else:
             chores = sql_db.get_all_chores(session["user"])
+            chores = timeconvert.convertTupleList(chores)
             return render_template("/dashboard.html", chores=chores) # chores=chores tells the page
     else:
         return redirect(url_for("index"))

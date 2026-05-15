@@ -26,7 +26,7 @@ class SqlDb(object):
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS chores (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT UNIQUE NOT NULL,
+                name TEXT NOT NULL,
                 description TEXT,
                 user_id INTEGER,
                 task_completion INTEGER DEFAULT 0,
@@ -267,12 +267,10 @@ class SqlDb(object):
             conn = self._connect()
             cursor = conn.cursor()
             cursor.execute(
-                "SELECT name, description FROM chores WHERE user_id= ?",
+                "SELECT name, description, weekday, time_slot FROM chores WHERE user_id= ?",
                 (user_id,)
             )
             row = cursor.fetchall()
-            #if row:
-            #    return {"id": row[0], "name": row[1], "description": row[2], "user_id": row[3]}
             return row
         except sqlite3.Error as e:
             print(f"Database error during chore retrieval: {e}")

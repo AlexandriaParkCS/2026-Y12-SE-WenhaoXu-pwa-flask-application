@@ -15,19 +15,31 @@ class timeconvert:
         elif weekday.casefold() == "sunday":
             return 6
 
-    def convertInt(integer): #backup function if i ever need it
+    def convertInt(integer):
         integer = int(integer)
-        if integer == 1:
-            return "monday"
+        if integer == 0:
+            return "Monday"
+        elif integer == 1:
+            return "Tuesday"
         elif integer == 2:
-            return "tuesday"
+            return "Wednesday"
         elif integer == 3:
-            return "wednesday"
+            return "Thursday"
         elif integer == 4:
-            return "thursday"
+            return "Friday"
         elif integer == 5:
-            return "friday"
+            return "Saturday"
         elif integer == 6:
-            return "saturday"
-        elif integer == 7:
-            return "sunday"
+            return "Sunday"
+
+    def convertTupleList(tup):
+        count = 0
+        for item in tup:
+            mylist = list(item)
+            tup[count] = mylist
+            count = count + 1
+
+        for item in tup:
+            item[2] = timeconvert.convertInt(item[2])
+
+        return tup
