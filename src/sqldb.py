@@ -68,14 +68,14 @@ class SqlDb(object):
             if conn: 
                 conn.close()
 
-    def get_user_by_id(self, id):
+    def get_user_by_id(self, uid):
         conn = None
         try:
             conn = self._connect()
             cursor = conn.cursor()
             cursor.execute(
                 "SELECT id, username, email, password_hash FROM users WHERE id = ?",
-                (id,)
+                (uid,)
             )
             row = cursor.fetchone()
             if row:
@@ -268,7 +268,7 @@ class SqlDb(object):
             conn = self._connect()
             cursor = conn.cursor()
             cursor.execute(
-                "SELECT name, description, weekday, time_hour, time_minute FROM chores WHERE user_id= ? ORDER BY weekday, time_hour, time_minute",
+                "SELECT name, description, weekday, time_hour, time_minute, id FROM chores WHERE user_id= ? ORDER BY weekday, time_hour, time_minute",
                 (user_id,)
             )
             row = cursor.fetchall()
@@ -299,21 +299,21 @@ class SqlDb(object):
             if conn: 
                 conn.close()
 
-    def delete_chore(self, name, user_id):
+    def delete_chore(self, chore_id, user_id):
         try:
             conn = self._connect()
             cursor = conn.cursor()
             cursor.execute(
-                "DELETE FROM chores WHERE name = ? AND user_id = ?",
-                (name, user_id)
+                "DELETE FROM chores WHERE id = ? AND user_id = ?",
+                (chore_id, user_id)
             )
-            row = cursor.fetchone()
-            if row:
-                return {"id": row[0], "name": row[1], "description": row[2], "user_id": row[3]}
+            conn.commit()
+            return cursor.rowcount > 0
         except sqlite3.Error as e:
-            print(f"Database error during chore retrieval: {e}")
+            print(f"Database error during chore deletion: {e}")
+            return False
         finally:
-            if cursor: 
+            if cursor:
                 cursor.close()
             if conn: 
                 conn.close()        

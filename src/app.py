@@ -394,7 +394,7 @@ def changePassword():
         return redirect(url_for("index"))
 
 @app.route("/dashboard", methods=["POST", "GET"])
-def creation():
+def dashboard():
     if "user" in session:
         if request.method == "POST": # Create Chores
             # Task name and description
@@ -439,6 +439,18 @@ def creation():
             chores = sql_db.get_all_chores(session["user"])
             chores = timeconvert.convertTupleList(chores)
             return render_template("/dashboard.html", chores=chores) # chores=chores tells the page
+    else:
+        return redirect(url_for("index"))
+
+@app.route("/delete_chore", methods=["POST"])
+def delete_chore():
+    if "user" in session:
+        if request.method == "POST":
+            choreID = request.form["chore_id"]
+            sql_db.delete_chore(choreID, session["user"])
+            print("CHORE ID:", choreID)
+            print("SESSION USER:", session["user"])
+            return redirect(url_for("dashboard"))
     else:
         return redirect(url_for("index"))
 

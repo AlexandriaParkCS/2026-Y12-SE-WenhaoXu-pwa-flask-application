@@ -184,6 +184,41 @@
           {% else %}
             <td>None</td>
           {% endif %}
+          <td>
+            <!-- Modal Button -->
+            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deletechore{{ chore[5] }}">
+              Delete
+            </button>
+
+            <div class="modal" id="deletechore{{ chore[5] }}">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  
+                  <!-- Modal Header -->
+                  <div class="modal-header">
+                    <h4 class="modal-title">Are you sure?</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                  </div>
+                  
+                  <!-- Modal Body -->
+                  <div class="modal-body">
+                  <strong>"{{chore[0]}}"</strong> will be deleted forever.
+                  </div>
+                  
+                  <!-- Modal Footer -->
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form method="POST" action="/delete_chore">
+                      <input type="hidden" name="chore_id" value="{{ chore[5] }}">
+                      <button type="submit" class="btn btn-danger">Confirm</button>
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    </form>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </td>
         </tr>
         {% endfor %}
     </tbody>
