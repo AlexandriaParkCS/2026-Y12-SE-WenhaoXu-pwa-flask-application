@@ -286,7 +286,7 @@ class SqlDb(object):
             conn = self._connect()
             cursor = conn.cursor()
             cursor.execute(
-                "SELECT name, description FROM chores WHERE user_id = ? AND weekday = ?",
+                "SELECT name, description, weekday, time_hour, time_minute FROM chores WHERE user_id = ? AND weekday = ?",
                 (user_id, weekday)
             )
             row = cursor.fetchall()

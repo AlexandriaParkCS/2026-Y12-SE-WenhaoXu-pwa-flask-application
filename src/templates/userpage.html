@@ -16,6 +16,7 @@
         <tr>
             <th>Task</th>
             <th>Description</th>
+            <th>Time</th>
         </tr>
     </thead>
     <tbody>
@@ -23,6 +24,11 @@
         <tr>
           <td>{{ chore[0] }}</td>
           <td>{{ chore[1] }}</td>
+          {% if chore[3] != "None" or chore[4] != "None" %}
+            <td>{{ chore[3] }}:{{chore[4]}}</td>
+          {% else %}
+            <td>None</td>
+          {% endif %}
         </tr>
         {% endfor %}
     </tbody>

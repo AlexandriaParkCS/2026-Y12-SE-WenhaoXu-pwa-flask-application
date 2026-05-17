@@ -51,10 +51,29 @@ class timeconvert:
         # changing to actual weekday for display
         for item in tup:
             item[2] = timeconvert.convertInt(item[2])
-        # SQL integers cannot store 01, and so this will change any 1,2,3 to 01,02,03 for display
+        
+        # If time is not left empty
         for item in tup:
-            if int(item[4])<10:
-                item[4] = f"0{item[4]}"
+            if item[3] != "None" or item[4] != "None":
+            # SQL integers cannot store 01, and so this will change any 1,2,3 to 01,02,03 for display
+            
+                if int(item[4])<10:
+                    item[4] = f"0{item[4]}"
+
+            # 12hr time conversion
+            # 1-11am, 12pm-11pm 12am
+            # item[3] is hour, item[4] is minutes
+            
+                if int(item[3]) < 12: # for 1-11 am (morning)
+                    item[4] = f"{item[4]}am"
+                elif int(item[3]) == 24: # for 12 am (midnight)
+                    item[3] = 12
+                    item[4] = f"{item[4]}am"
+                elif int(item[3]) == 12: # for 12 pm (midday)
+                    item[4] = f"{item[4]}pm"
+                else: # for 1-11pm (afternoon)
+                    item[3] = int(item[3]) - 12
+                    item[4] = f"{item[4]}pm"
 
         return tup
 

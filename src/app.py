@@ -180,6 +180,7 @@ def home():
         weekday = datetime.now().weekday()
         chores = sql_db.get_all_chores_by_day(session["user"], weekday)
         weekday = timeconvert.convertInt(weekday)
+        chores = timeconvert.convertTupleList(chores)        
 
         credentials = sql_db.get_user_by_id(session["user"])
         user = credentials["username"]

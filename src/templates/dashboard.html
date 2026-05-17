@@ -48,7 +48,7 @@
               <div class="d-flex align-items-center gap-2">
                   <label class="form-label">(Optional) Time: </label>
                   <select name="timehour">
-                    <option></option>
+                    <option value="None"></option>
                     <option>1</option>
                     <option>2</option>
                     <option>3</option>
@@ -64,7 +64,7 @@
                   </select>
                   <span>:</span>
                   <select name="timeminute">
-                    <option></option>
+                    <option value="None"></option>
                     <option>00</option>
                     <option>01</option>
                     <option>02</option>
@@ -127,7 +127,6 @@
                     <option>59</option>
                   </select>
                   <select name="meridiem">
-                    <option></option>
                     <option>am</option>
                     <option>pm</option>
                   </select>
@@ -180,7 +179,11 @@
           <td>{{ chore[0] }}</td>
           <td>{{ chore[1] }}</td>
           <td>{{ chore[2] }}</td>
-          <td>{{ chore[3] }}:{{ chore[4] }} {{chore[5]}}</td>
+          {% if chore[3] != "None" or chore[4] != "None" %}
+            <td>{{ chore[3] }}:{{chore[4]}}</td>
+          {% else %}
+            <td>None</td>
+          {% endif %}
         </tr>
         {% endfor %}
     </tbody>
