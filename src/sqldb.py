@@ -299,6 +299,23 @@ class SqlDb(object):
             if conn: 
                 conn.close()
 
+    def update_chore_completion(self, task_completion, chore_id, user_id):
+        try:
+            conn = self._connect()
+            cursor = conn.cursor()
+            cursor.execute(
+                "UPDATE chores SET task_completion = ? WHERE id = ? AND user_id = ?",
+                (task_completion, chore_id, user_id)
+            )
+            conn.commit()
+        except sqlite3.Error as e:
+            print(f"Database error during chore completion update: {e}")
+        finally:
+            if cursor: 
+                cursor.close()
+            if conn: 
+                conn.close()
+
     def delete_chore(self, chore_id, user_id):
         try:
             conn = self._connect()

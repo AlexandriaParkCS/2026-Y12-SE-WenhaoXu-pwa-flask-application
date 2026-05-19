@@ -189,7 +189,7 @@ def home():
     else:
         redirect(url_for("login"))
 
-# dashboard
+# Settings
 @app.route("/settings", methods=["POST", "GET"])
 def settings():
     if "user" in session:
@@ -197,8 +197,7 @@ def settings():
     else:
         return redirect(url_for("login"))
 
-# Example Logout; Change maybe?
-
+# Logout
 @app.route("/logout", methods=["POST", "GET"])
 def logout():
     if "user" in session:
@@ -448,11 +447,14 @@ def delete_chore():
         if request.method == "POST":
             choreID = request.form["chore_id"]
             sql_db.delete_chore(choreID, session["user"])
-            print("CHORE ID:", choreID)
-            print("SESSION USER:", session["user"])
+            print(f"Chore with ID {choreID}, UID {session["user"]} deleted.")
             return redirect(url_for("dashboard"))
     else:
         return redirect(url_for("index"))
+    
+@app.route("/mark_complete", methods=["POST"])
+def mark_complete():
+    pass
 
 # Endpoint for logging CSP violations
 @app.route("/csp_report", methods=["POST"])

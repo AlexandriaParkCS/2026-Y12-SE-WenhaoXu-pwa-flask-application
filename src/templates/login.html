@@ -20,7 +20,7 @@
       {% with messages = get_flashed_messages() %}
         {% if messages %}
           {% for msg in messages %}
-            <div class="alert alert-danger">{{msg}}</div>
+            <div class="alert alert-danger">Error: {{msg}}</div>
           {% endfor %}
         {% endif %}
       {% endwith %}
