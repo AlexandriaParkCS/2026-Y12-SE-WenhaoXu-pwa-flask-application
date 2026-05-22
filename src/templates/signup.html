@@ -11,15 +11,15 @@
     <form action="/signup" method="POST" class="box">
       <div class="col-auto">
         <label for="signup_username" class="form-label">Username</label>
-        <input name="username" type="text" class="form-control" id="signup_username" placeholder="myusername">
+        <input name="username" type="text" class="form-control" id="signup_username" placeholder="Username Between 1-50 characters">
       </div>
       <div class="col-auto">
         <label for="signup_email" class="form-label">Email address</label>
-        <input name="email" type="email" class="form-control" id="signup_email" placeholder="name@example.com">
+        <input name="email" type="email" class="form-control" id="signup_email" placeholder="Email">
       </div>
       <div class="col-auto">
         <label for="signup_password" class="form-label">Password</label>
-        <input name="password" type="password" class="form-control" id="signup_password">
+        <input name="password" type="password" class="form-control" id="signup_password" placeholder="Password must include 8 characters, one lowercase, one uppercase, one number and one special character ()">
       </div>
       {% with messages = get_flashed_messages() %}
         {% if messages %}

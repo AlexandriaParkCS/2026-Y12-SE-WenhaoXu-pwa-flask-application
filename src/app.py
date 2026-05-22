@@ -71,7 +71,7 @@ def index():
     else:
         return redirect(url_for("home"))
 
-# find someway to deal w/ this
+# Privacy statement
 @app.route("/privacy", methods=["GET"])
 def privacy():
     if "user" not in session:
@@ -79,7 +79,7 @@ def privacy():
     else:
         return render_template("/privacy2.html")
 
-# Perhaps change to two screens; login by email or login by username
+# Login
 @app.route("/login", methods=["POST", "GET"])
 def login():
     if "user" not in session:
@@ -173,7 +173,6 @@ def sign_up():
 def sgnconfirm():
     return render_template("/signup2.html")
 
-# THIS NEEDS WORK
 @app.route("/home", methods=["POST", "GET"]) #user page / homepage
 def home():
     if "user" in session:
